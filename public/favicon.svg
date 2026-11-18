@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <rect x="2" y="2" width="60" height="60" rx="14" fill="#0B1220"/>
+  <rect x="2" y="2" width="60" height="60" rx="14" stroke="#60A5FA" stroke-opacity="0.7" stroke-width="2.5"/>
+  <!-- Bold Geometric V -->
+  <path d="M9.5 19H15.8L20.8 38.5L25.8 19H32L23.8 46H17.8L9.5 19Z" fill="#F8FAFC"/>
+  <!-- Bold Geometric N -->
+  <path d="M35 46V19H40.8L49 34.8V19H54.5V46H48.8L40.5 29.8V46H35Z" fill="#60A5FA"/>
+</svg>
