@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <meta name="description" content="Personal portfolio of Mikael Vladimir M. Neri featuring projects, work experience, certifications, VladGPT assistant, and an interactive 2048 easter egg.">
+    <meta property="og:title" content="<%= title %>">
+    <meta property="og:description" content="Personal portfolio of Mikael Vladimir M. Neri featuring projects, work experience, certifications, VladGPT assistant, and an interactive 2048 easter egg.">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body data-barba="wrapper">
+    <canvas id="starfield"></canvas>
+
+    <button id="theme-toggle" type="button" class="pull-chain theme-toggle-btn" aria-label="Toggle light and dark mode" aria-pressed="false" title="Toggle light / dark mode">
+        <span class="chain-string"></span>
+        <span class="chain-handle"></span>
+    </button>
+
+    <% if (!isFrontPage) { %>
+    <nav class="side-dock">
+        <a href="/projects" aria-label="Projects" class="<%= currentPage === 'projects' ? 'active' : '' %>">
+            <i class="fa-regular fa-folder"></i>
+        </a>
+        <a href="/about" aria-label="About" class="<%= currentPage === 'about' ? 'active' : '' %>">
+            <i class="fa-regular fa-user"></i>
+        </a>
+        <a href="/" aria-label="Home">
+            <i class="fa-solid fa-house"></i>
+        </a>
+        <a href="/work" aria-label="Work" class="<%= currentPage === 'work' ? 'active' : '' %>">
+            <i class="fa-solid fa-briefcase"></i>
+        </a>
+        <a href="/contact" aria-label="Contact" class="<%= currentPage === 'contact' ? 'active' : '' %>">
+            <div class="nav-icon-circle">
+                <i class="fa-regular fa-paper-plane"></i>
+            </div>
+        </a>
+    </nav>
+    <% } %>
+
+    <main data-barba="container" data-barba-namespace="default">
+        <header class="profile-header">
+            <h1 class="name-title">Vlad Neri</h1>
+            <p class="role-subtitle">4th Yr. Com Sci Student | Aspiring Data Analyst</p>
+        </header>
