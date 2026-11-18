@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vlad Neri — AI/ML, Full-Stack &amp; Creative Systems</title>
+    <meta name="description" content="Portfolio of Mikael Vladimir M. Neri — AI/ML &amp; Data Engineer, Full-Stack Web &amp; Android Developer, Certified Cybersecurity Professional (CCP), and Video Editor.">
+    <meta property="og:title" content="Vlad Neri — AI/ML, Full-Stack &amp; Creative Systems">
+    <meta property="og:description" content="Explore About Me, Tech Stack, FSLAMES, Jonathan Photography System, BarangayONE, embedded video edits, CCP certification, and 11 shipped builds.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body class="bg-mode-hyperspace">
+    <!-- Top Scroll Progress Line -->
+    <div id="scroll-progress-bar" class="scroll-progress-bar" aria-hidden="true"></div>
+
+    <!-- Star Wars + VladGPT Morphing Starfield Canvas -->
+    <canvas id="starfield" aria-hidden="true"></canvas>
+
+    <!-- Lightweight Single-Shape Precision Cursor (Fine-Pointer Desktop Only) -->
+    <div id="llm-cursor" class="llm-cursor" aria-hidden="true">
+        <span class="llm-cursor-dot"></span>
+        <span id="llm-cursor-label" class="llm-cursor-label"></span>
+    </div>
+
+    <!-- Hanging Pull-Chain Light/Dark Theme Toggle -->
+    <button id="theme-toggle" type="button" class="pull-chain theme-toggle-btn" aria-label="Toggle light and dark mode" aria-pressed="false" data-cursor="Theme" title="Pull to toggle light / dark mode">
+        <span class="chain-string"></span>
+        <span class="chain-handle"></span>
+    </button>
+
+    <!-- Mobile / Tablet Backdrop for Sidebar Drawer -->
+    <div id="sidebar-backdrop" class="sidebar-backdrop" hidden></div>
+
+    <div class="app-shell">
+        <!-- =========================================================
+             SLIDE-OUT SCROLL-SYNCED SIDEBAR (OPENED VIA NAVBAR NAME)
+             ========================================================= -->
+        <aside id="llm-sidebar" class="llm-sidebar" aria-label="Portfolio sections navigation" aria-hidden="true">
+            <div class="sidebar-top">
+                <span class="sidebar-brand-text">Vlad <span>Neri</span></span>
+                <button id="sidebar-close-btn" type="button" class="sidebar-icon-btn" aria-label="Close navigation sidebar" data-cursor="Close" title="Close sidebar">
+                    <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                </button>
+            </div>
+
+            <nav class="sidebar-scroll" aria-label="Scroll order navigation">
+                <a href="#about" class="thread-item active" data-section="about" data-cursor="Jump">
+                    <span class="thread-dot" aria-hidden="true"></span>
+                    <span class="thread-title">About Me</span>
+                </a>
+                <a href="#tech-stack" class="thread-item" data-section="tech-stack" data-cursor="Jump">
+                    <span class="thread-dot" aria-hidden="true"></span>
+                    <span class="thread-title">Tech Stack</span>
+                </a>
+                <a href="#projects" class="thread-item" data-section="projects" data-cursor="Jump">
+                    <span class="thread-dot" aria-hidden="true"></span>
+                    <span class="thread-title">Projects (11)</span>
+                </a>
+                <a href="#experience" class="thread-item" data-section="experience" data-cursor="Jump">
+                    <span class="thread-dot" aria-hidden="true"></span>
+                    <span class="thread-title">Work &amp; Video Reels</span>
+                </a>
+                <a href="#education" class="thread-item" data-section="education" data-cursor="Jump">
+                    <span class="thread-dot" aria-hidden="true"></span>
+                    <span class="thread-title">Credentials &amp; CCP</span>
+                </a>
+                <a href="#contact" class="thread-item" data-section="contact" data-cursor="Jump">
+                    <span class="thread-dot" aria-hidden="true"></span>
+                    <span class="thread-title">Contact &amp; OJT</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="sidebar-meta-line">
+                    <span>Rosario, La Union · PH</span>
+                </div>
+                <div class="sidebar-footer-actions">
+                    <button id="open-game-btn" type="button" class="sidebar-game-btn" data-cursor="Play" title="Play 2048">
+                        <i class="fa-solid fa-gamepad" aria-hidden="true"></i>
+                        <span>Play 2048</span>
+                    </button>
+                    <div class="sidebar-social-row">
+                        <a href="https://github.com/NeriVlad21" target="_blank" rel="noopener noreferrer" aria-label="GitHub NeriVlad21" data-cursor="GitHub" title="GitHub">
+                            <i class="fa-brands fa-github" aria-hidden="true"></i>
+                        </a>
+                        <a href="https://www.linkedin.com/in/mikaelvladimir" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" data-cursor="LinkedIn" title="LinkedIn">
+                            <i class="fa-brands fa-linkedin-in" aria-hidden="true"></i>
+                        </a>
+                        <a href="mailto:mereziko@gmail.com" aria-label="Email Vlad Neri" data-cursor="Email" title="Email">
+                            <i class="fa-solid fa-envelope" aria-hidden="true"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- =========================================================
+             ONE-LONG-SCROLL MAIN CONTENT
+             ========================================================= -->
+        <div class="main-stage">
+            <!-- Minimal Top Navbar — Name Acts as Logo + Top-Scroll Sidebar Trigger -->
+            <header class="top-bar">
+                <button id="brand-nav-trigger" type="button" class="top-bar-brand" aria-label="Scroll to top and toggle navigation sidebar" aria-controls="llm-sidebar" aria-expanded="false" data-cursor="Menu" title="Scroll up & open navigation sidebar">
+                    Vlad <span>Neri</span>
+                </button>
+                <nav class="top-bar-nav" aria-label="Primary navigation">
+                    <a href="#about" class="top-nav-desktop-only" data-cursor="About">About</a>
+                    <a href="#projects" class="top-nav-desktop-only" data-cursor="Projects">Projects</a>
+                    <a href="#contact" class="top-bar-cta btn-3d" data-tilt data-cursor="Contact">Let's talk</a>
+                </nav>
+            </header>
+
+            <main class="content-stream">
+                <!-- =================================================
+                     SECTION 1 (ON TOP): 2-COLUMN LANDING & ABOUT ME (#about)
+                     ================================================= -->
+                <section id="about" class="portfolio-section about-hero-section" data-scroll-section data-bg-mode="hyperspace">
+                    <div class="about-hero-split">
+                        <!-- Left Column: Big Portrait, Role Subtitle & Action Controls -->
+                        <div class="hero-left-col">
+                            <div class="hero-portrait-frame media-frame">
+                                <img src="./profile.jpg" alt="Portrait of Mikael Vladimir M. Neri" referrerpolicy="no-referrer">
+                            </div>
+                            <p class="hero-left-subtitle">CS Student · CCP · OJT Ready</p>
+                            <div class="hero-cta-row">
+                                <a href="#projects" class="btn-3d btn-3d-primary" data-tilt data-cursor="Projects">
+                                    <span>Projects</span>
+                                    <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                                </a>
+                                <a href="./Neri_Vladimir_Resume.pdf" download="Neri_Vladimir_Resume.pdf" class="btn-flat btn-flat-navy" data-cursor="PDF">
+                                    <i class="fa-solid fa-file-arrow-down" aria-hidden="true"></i>
+                                    <span>Resume PDF</span>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Right Column: Kicker, Name, Changing Role Ticker, Quote & 3 Specs -->
+                        <div class="hero-right-col">
+                            <p class="about-kicker">ABOUT ME</p>
+
+                            <h1 class="hero-name-display">
+                                Mikael Vladimir <span class="headline-accent">M. Neri</span>
+                            </h1>
+
+                            <div class="role-marquee-divider" aria-label="Core disciplines">
+                                <span class="role-line role-line-left" aria-hidden="true"></span>
+                                <span class="role-marquee-text">
+                                    <span id="role-slideshow-text">AI &amp; DATA SYSTEMS</span><span class="role-caret" aria-hidden="true"></span>
+                                </span>
+                                <span class="role-line role-line-right" aria-hidden="true"></span>
+                            </div>
+
+                            <blockquote class="about-editorial-quote">
+                                “Hi, I'm Vlad. I'm a Computer Science student and Certified Cybersecurity Professional who loves building practical systems—from offline sign-language ML pipelines and contracted studio web platforms to Android apps, 2D/3D AI data labeling, and short-form video edits.”
+                            </blockquote>
+
+                            <div class="hero-specs-inline">
+                                <div class="hero-spec-item">
+                                    <span class="spec-kicker">Languages</span>
+                                    <p>English (C1/C2), Filipino, Bisaya</p>
+                                </div>
+                                <div class="hero-spec-item">
+                                    <span class="spec-kicker">Work Station</span>
+                                    <p>Dedicated PC, Headset &amp; Fiber</p>
+                                </div>
+                                <div class="hero-spec-item">
+                                    <span class="spec-kicker">OJT Schedule</span>
+                                    <p>Dec 2026 (~500 hrs) · Remote / Hybrid</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Full-Width 4-Column Proof Strip -->
+                    <div class="metrics-strip reveal-block" aria-label="Key portfolio metrics">
+                        <div class="metric-cell">
+                            <span class="metric-value tabular-nums">11</span>
+                            <span class="metric-label">Shipped Web, App &amp; ML Builds</span>
+                        </div>
+                        <div class="metric-cell">
+                            <span class="metric-value tabular-nums">90%</span>
+                            <span class="metric-label">Data Annotation Accuracy</span>
+                        </div>
+                        <div class="metric-cell">
+                            <span class="metric-value tabular-nums">1.77</span>
+                            <span class="metric-label">CS Average GWA (1.57 Best Sem)</span>
+                        </div>
+                        <div class="metric-cell">
+                            <span class="metric-value tabular-nums">CCP</span>
+                            <span class="metric-label">Certified Cybersecurity Professional</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- =================================================
+                     SECTION 2: TECH STACK SIGNAL TRACK (#tech-stack)
+                     ================================================= -->
+                <section id="tech-stack" class="portfolio-section reveal-block" data-scroll-section data-bg-mode="hyperspace">
+                    <div class="stack-header-split">
+                        <div class="stack-heading-col">
+                            <p class="section-kicker"><i class="fa-solid fa-microchip" aria-hidden="true"></i> TECH STACK</p>
+                            <h2 class="editorial-heading">The languages, platforms &amp; tools I work with</h2>
+                        </div>
+                        <p class="stack-header-note">
+                            Everything here comes from real thesis pipelines, contracted client systems, native Android apps, and production data labeling.
+                        </p>
+                    </div>
+
+                    <!-- Signal Beam Track & Interactive 3D Tool Icons -->
+                    <div class="stack-signal-stage">
+                        <div class="stack-signal-beams" aria-hidden="true">
+                            <span class="signal-beam beam-1"></span>
+                            <span class="signal-beam beam-2"></span>
+                            <span class="signal-beam beam-3"></span>
+                            <span class="signal-diag diag-1"></span>
+                            <span class="signal-diag diag-2"></span>
+                        </div>
+
+                        <div id="stack-rack" class="stack-icon-rack" role="listbox" aria-label="Interactive technology stack">
+                            <!-- Populated cleanly from TECH_STACK_NODES -->
+                        </div>
+
+                        <div id="stack-active-tooltip" class="stack-tooltip-card" role="status" aria-live="polite">
+                            <div class="stack-tooltip-head">
+                                <strong id="stack-tooltip-name">MediaPipe</strong>
+                                <span class="tooltip-sep" aria-hidden="true">·</span>
+                                <span id="stack-tooltip-role">Hand &amp; Pose Landmarks</span>
+                            </div>
+                            <p id="stack-tooltip-detail" class="stack-tooltip-detail">
+                                Real-time 21-point skeletal &amp; hand tracking from video sign sequences
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Complete Stack Breakdown (synced with active icon selection) -->
+                    <div id="stack-drawer" class="stack-panel">
+                        <div class="stack-categories">
+                            <div class="stack-group is-group-active" data-group="ai-ml">
+                                <h4>Data &amp; AI / ML</h4>
+                                <p>Python, Pandas, TensorFlow / Keras, MediaPipe, TFLite, SQLite, 2D/3D Data Annotation</p>
+                            </div>
+                            <div class="stack-group" data-group="web-stack">
+                                <h4>Full-Stack &amp; Web</h4>
+                                <p>React, Vite, Django, PHP, MySQL, JavaScript, HTML5, CSS3, Streamlit</p>
+                            </div>
+                            <div class="stack-group" data-group="mobile-sec">
+                                <h4>Mobile &amp; Security</h4>
+                                <p>Kotlin, Jetpack Compose, Android Studio, Firebase, Certified Cybersecurity Professional (CCP)</p>
+                            </div>
+                            <div class="stack-group" data-group="cloud-media">
+                                <h4>Cloud &amp; Video Production</h4>
+                                <p>AWS (EC2, S3, Lambda), Git / GitHub, Figma, Linux (Ubuntu), DaVinci Resolve, CapCut</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- =================================================
+                     SECTION 3: UNIFIED PROJECTS (#projects)
+                     ================================================= -->
+                <section id="projects" class="portfolio-section reveal-block" data-scroll-section data-bg-mode="vladgpt">
+                    <div class="section-header-split">
+                        <div>
+                            <p class="section-kicker">PROJECTS</p>
+                            <h2 class="editorial-heading">Featured Work &amp; Project Archive.</h2>
+                        </div>
+                        <div class="filter-tabs" role="tablist" aria-label="Filter projects by category">
+                            <button type="button" class="filter-tab active" data-filter="all" role="tab" aria-selected="true" data-cursor="Filter">All (11)</button>
+                            <button type="button" class="filter-tab" data-filter="ai-data" role="tab" aria-selected="false" data-cursor="Filter">AI &amp; Data</button>
+                            <button type="button" class="filter-tab" data-filter="web" role="tab" aria-selected="false" data-cursor="Filter">Web</button>
+                            <button type="button" class="filter-tab" data-filter="android" role="tab" aria-selected="false" data-cursor="Filter">Android</button>
+                        </div>
+                    </div>
+
+                    <div id="vault-grid" class="vault-grid">
+                        <!-- Rendered dynamically from PROJECTS with top 3 featured highlights inside Projects -->
+                    </div>
+                </section>
+
+                <!-- =================================================
+                     SECTION 4: WORK & VIDEO REELS (#experience)
+                     ================================================= -->
+                <section id="experience" class="portfolio-section reveal-block" data-scroll-section data-bg-mode="vladgpt">
+                    <div class="section-header-split">
+                        <div>
+                            <p class="section-kicker">EXPERIENCE &amp; MEDIA</p>
+                            <h2 class="editorial-heading">AI data labeling &amp; short-form video production.</h2>
+                        </div>
+                        <a href="https://www.youtube.com/@TenthTide" target="_blank" rel="noopener noreferrer" class="text-link" data-cursor="YouTube">TenthTide Vibes <span aria-hidden="true">↗</span></a>
+                    </div>
+
+                    <div class="experience-grid">
+                        <article class="experience-card card-3d reveal-block" data-tilt>
+                            <div class="experience-head">
+                                <div>
+                                    <h3>Data Annotation Specialist</h3>
+                                    <p class="experience-org">Remotasks · Remote</p>
+                                </div>
+                                <span class="experience-dates tabular-nums">Jul 2025 – Present</span>
+                            </div>
+                            <p class="experience-copy">
+                                Label, review, and QA <strong>2D &amp; 3D perception datasets</strong> with <strong>90% data annotation accuracy</strong>, resolving edge cases across production batches.
+                            </p>
+                        </article>
+
+                        <article class="experience-card card-3d reveal-block" data-tilt>
+                            <div class="experience-head">
+                                <div>
+                                    <h3>Social Media Manager &amp; Video Editor</h3>
+                                    <p class="experience-org">Creator Pages &amp; YouTube · Remote</p>
+                                </div>
+                                <span class="experience-dates tabular-nums">Jul 2023 – Present</span>
+                            </div>
+                            <p class="experience-copy">
+                                Manage publishing, retention pacing, and short-form edits for a <strong>1.3M+ follower Facebook page</strong> and <strong>TenthTide Vibes</strong> (1.5K+ subscribers).
+                            </p>
+                        </article>
+                    </div>
+
+                    <div class="private-channel-note reveal-block">
+                        <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+                        <p>
+                            <strong>Note:</strong> Aside from public client edits, I also maintain a separate private monetized streamer-clipping channel for supplementary income. I omit its link here simply to prevent unnecessary false reports.
+                        </p>
+                    </div>
+
+                    <div class="media-showcase-header">
+                        <h3>Watch Selected Edits</h3>
+                        <p>Select any reel or YouTube edit below to play right inside the portfolio.</p>
+                    </div>
+
+                    <div id="media-grid" class="media-grid">
+                        <!-- Populated cleanly from MEDIA_SHOWCASE -->
+                    </div>
+                </section>
+
+                <!-- =================================================
+                     SECTION 5: EDUCATION & CLICK-TO-INSPECT CREDENTIALS (#education)
+                     ================================================= -->
+                <section id="education" class="portfolio-section reveal-block" data-scroll-section data-bg-mode="vladgpt">
+                    <div class="section-header-split">
+                        <div>
+                            <p class="section-kicker">CREDENTIALS</p>
+                            <h2 class="editorial-heading">Education &amp; Verified Certifications.</h2>
+                        </div>
+                        <a href="https://g.dev/ikovlad21" target="_blank" rel="noopener noreferrer" class="text-link" data-cursor="Profile">Google Dev Badges <span aria-hidden="true">↗</span></a>
+                    </div>
+
+                    <div class="education-banner reveal-block">
+                        <div>
+                            <p class="edu-school">PHINMA UPang College of Urdaneta · Pangasinan</p>
+                            <h3>Bachelor of Science in Computer Science</h3>
+                            <p class="edu-meta">2023 – Expected 2027 · Also certified: Python, Django &amp; AWS (Zuitt, 80 hrs)</p>
+                        </div>
+                        <div class="edu-gwa-box">
+                            <div>
+                                <span class="tabular-nums edu-gwa-num">1.77</span>
+                                <span class="edu-gwa-label">Average GWA</span>
+                            </div>
+                            <div>
+                                <span class="tabular-nums edu-gwa-num">1.57</span>
+                                <span class="edu-gwa-label">Best Sem</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Featured CCP Spotlight (Click picture or button to inspect details in lightbox) -->
+                    <div class="cert-spotlight-card card-3d reveal-block" data-tilt>
+                        <button type="button" class="cert-spotlight-media media-frame"
+                            data-cert-src="./CCP_cert.png"
+                            data-cert-title="Certified Cybersecurity Professional (CCP)"
+                            data-cert-meta="Appkademiya · Issued Oct 4, 2026 · ID: CERT-CCP-20261004-C1EA4A4F1136"
+                            data-cert-desc="Verified industry credential validating practical security posture, threat awareness, and secure systems hygiene."
+                            data-cert-verify="https://appkademiya.online/verify/CERT-CCP-CYBERSECURITY-PROFESSIONAL-20261004-C1EA4A4F1136"
+                            data-cursor="Zoom"
+                            aria-label="Open Certified Cybersecurity Professional certificate and details">
+                            <img src="./CCP_cert.png" alt="Appkademiya Certified Cybersecurity Professional Certificate" referrerpolicy="no-referrer">
+                        </button>
+                        <div class="cert-spotlight-copy">
+                            <p class="cert-spotlight-issuer">Appkademiya · Issued Oct 4, 2026</p>
+                            <h3>Certified Cybersecurity Professional (CCP)</h3>
+                            <p>Verified industry credential validating practical security posture, threat awareness, and secure systems hygiene.</p>
+                            <p class="cert-spotlight-id tabular-nums">ID: CERT-CCP-20261004-C1EA4A4F1136</p>
+                            <div class="cert-spotlight-actions">
+                                <button type="button" class="btn-3d btn-3d-primary btn-sm-pill cert-thumb-trigger"
+                                    data-cert-src="./CCP_cert.png"
+                                    data-cert-title="Certified Cybersecurity Professional (CCP)"
+                                    data-cert-meta="Appkademiya · Issued Oct 4, 2026 · ID: CERT-CCP-20261004-C1EA4A4F1136"
+                                    data-cert-desc="Verified industry credential validating practical security posture, threat awareness, and secure systems hygiene."
+                                    data-cert-verify="https://appkademiya.online/verify/CERT-CCP-CYBERSECURITY-PROFESSIONAL-20261004-C1EA4A4F1136"
+                                    data-tilt data-cursor="View">
+                                    <span>View Certificate</span>
+                                </button>
+                                <a href="https://appkademiya.online/verify/CERT-CCP-CYBERSECURITY-PROFESSIONAL-20261004-C1EA4A4F1136" target="_blank" rel="noopener noreferrer" class="btn-flat btn-flat-subtle btn-sm-pill" data-cursor="Verify">
+                                    <span>Verify Credential</span>
+                                    <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Balanced 4-Column Certificate Row (Click any picture to view full certificate & details) -->
+                    <div class="cert-thumbs-grid" aria-label="Additional certificates">
+                        <button type="button" class="cert-thumb-btn reveal-block"
+                            data-cert-src="./Analytics_cert.jpg"
+                            data-cert-title="Data Analytics Essentials"
+                            data-cert-meta="Cisco Networking Academy · Jan 2026"
+                            data-cert-desc="Covers data collection pipelines, cleaning, SQL analysis, and dashboard storytelling."
+                            data-cursor="View">
+                            <div class="cert-thumb-frame media-frame">
+                                <img src="./Analytics_cert.jpg" alt="Cisco Networking Academy Data Analytics Essentials Certificate" referrerpolicy="no-referrer">
+                            </div>
+                            <span>Data Analytics Essentials</span>
+                        </button>
+                        <button type="button" class="cert-thumb-btn reveal-block"
+                            data-cert-src="./Data_cert.jpg"
+                            data-cert-title="Introduction to Data Science"
+                            data-cert-meta="Cisco Networking Academy · Dec 2025"
+                            data-cert-desc="Covers data engineering foundations, exploratory modeling, and AI workflows."
+                            data-cursor="View">
+                            <div class="cert-thumb-frame media-frame">
+                                <img src="./Data_cert.jpg" alt="Cisco Networking Academy Introduction to Data Science Certificate" referrerpolicy="no-referrer">
+                            </div>
+                            <span>Intro to Data Science</span>
+                        </button>
+                        <button type="button" class="cert-thumb-btn reveal-block"
+                            data-cert-src="./Cyber_cert.png"
+                            data-cert-title="Introduction to Cybersecurity Awareness"
+                            data-cert-meta="HP LIFE · HP Foundation · Jul 2025"
+                            data-cert-desc="Covers digital hygiene, threat mitigation, credential protection, and data privacy."
+                            data-cursor="View">
+                            <div class="cert-thumb-frame media-frame">
+                                <img src="./Cyber_cert.png" alt="HP LIFE Introduction to Cybersecurity Awareness Certificate" referrerpolicy="no-referrer">
+                            </div>
+                            <span>Cybersecurity Awareness</span>
+                        </button>
+                        <button type="button" class="cert-thumb-btn reveal-block"
+                            data-cert-src="./Execel_cert.png"
+                            data-cert-title="Microsoft Excel Beginner to Expert"
+                            data-cert-meta="Udemy Certificate of Completion · 2024"
+                            data-cert-desc="Covers lookup formulas, pivot tables, automated charts, and reporting models."
+                            data-cursor="View">
+                            <div class="cert-thumb-frame media-frame">
+                                <img src="./Execel_cert.png" alt="Udemy Microsoft Excel Course Beginner to Expert Certificate" referrerpolicy="no-referrer">
+                            </div>
+                            <span>Excel Beginner to Expert</span>
+                        </button>
+                    </div>
+                </section>
+
+                <!-- =================================================
+                     SECTION 6: CENTERED EDITORIAL CONTACT (#contact)
+                     ================================================= -->
+                <section id="contact" class="portfolio-section contact-center-section reveal-block" data-scroll-section data-bg-mode="vladgpt">
+                    <div class="contact-center-head">
+                        <div class="contact-squircle-badge card-3d" data-tilt aria-hidden="true">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        </div>
+                        <h2 class="contact-editorial-headline">
+                            Looking for someone
+                            <span>who can build and create?</span>
+                        </h2>
+                        <p class="contact-center-sub">
+                            Open for web development, AI &amp; data annotation, cybersecurity or short-form video work, and my ~500-hour Computer Science OJT starting December 2026. Tell me about the role or project and I'll reply within 24 hours.
+                        </p>
+                        <p class="contact-inline-meta">
+                            <a href="mailto:mereziko@gmail.com" data-cursor="Email">mereziko@gmail.com</a>
+                            <span aria-hidden="true">·</span>
+                            <a href="tel:+639454998054" class="tabular-nums" data-cursor="Call">0945 499 8054</a>
+                            <span aria-hidden="true">·</span>
+                            <span>Rosario, La Union</span>
+                        </p>
+                    </div>
+
+                    <form id="contact-form" class="contact-form-card contact-form-centered card-3d" data-tilt>
+                        <label class="field-label">
+                            <span>Inquiry Type</span>
+                            <select id="contact-topic" name="topic">
+                                <option value="Dec 2026 OJT / Internship">Dec 2026 OJT / Internship (~500 hrs)</option>
+                                <option value="Web or Mobile Project">Web or Mobile Project Commission</option>
+                                <option value="Data & AI Role">Data Annotation / AI Engineering Role</option>
+                                <option value="Video Editing & Motion">Video Editing &amp; Motion Graphics</option>
+                            </select>
+                        </label>
+
+                        <div class="form-row-2">
+                            <label class="field-label">
+                                <span>Name</span>
+                                <input type="text" id="contact-name" name="name" placeholder="Your name" required>
+                            </label>
+                            <label class="field-label">
+                                <span>Email</span>
+                                <input type="email" id="contact-email" name="email" placeholder="you@company.com" required>
+                            </label>
+                        </div>
+                        <label class="field-label">
+                            <span>Message</span>
+                            <textarea id="contact-message" name="message" rows="4" placeholder="Tell me about the role, project scope, or timeline" required></textarea>
+                        </label>
+                        <div class="form-actions-row">
+                            <button type="submit" class="btn-3d btn-3d-primary form-submit-btn" data-tilt data-cursor="Send">
+                                <span>Send Message</span>
+                                <i class="fa-solid fa-paper-plane" aria-hidden="true"></i>
+                            </button>
+                            <button type="button" id="copy-inquiry-btn" class="btn-flat btn-flat-navy form-copy-btn" data-cursor="Copy">
+                                <i class="fa-solid fa-copy" aria-hidden="true"></i>
+                                <span>Copy Note</span>
+                            </button>
+                        </div>
+                        <p id="contact-status" class="form-status" role="status" aria-live="polite"></p>
+                    </form>
+                </section>
+            </main>
+
+            <!-- Clean 3-Column Minimal Footer (Name Wordmark, No Box Logo) -->
+            <footer class="site-footer">
+                <div class="footer-grid-3">
+                    <div class="footer-col">
+                        <h3>Navigate</h3>
+                        <ul class="footer-link-list">
+                            <li><a href="#about" data-cursor="About">About Me</a></li>
+                            <li><a href="#tech-stack" data-cursor="Stack">Tech Stack</a></li>
+                            <li><a href="#projects" data-cursor="Projects">Projects</a></li>
+                            <li><a href="#experience" data-cursor="Work">Experience &amp; Reels</a></li>
+                            <li><a href="#education" data-cursor="Credentials">Credentials</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="footer-col">
+                        <h3>What I do</h3>
+                        <ul class="footer-text-list">
+                            <li>AI &amp; Data Pipelines</li>
+                            <li>Full-Stack Web Development</li>
+                            <li>Android Apps (Kotlin &amp; Compose)</li>
+                            <li>Short-Form Video &amp; Motion</li>
+                            <li>Cybersecurity (CCP)</li>
+                        </ul>
+                    </div>
+
+                    <div class="footer-col">
+                        <h3>Contact</h3>
+                        <ul class="footer-link-list">
+                            <li><a href="mailto:mereziko@gmail.com" data-cursor="Email">Email</a></li>
+                            <li><a href="https://www.linkedin.com/in/mikaelvladimir" target="_blank" rel="noopener noreferrer" data-cursor="LinkedIn">LinkedIn</a></li>
+                            <li><a href="https://github.com/NeriVlad21" target="_blank" rel="noopener noreferrer" data-cursor="GitHub">GitHub (NeriVlad21)</a></li>
+                            <li><a href="https://github.com/ikovlad" target="_blank" rel="noopener noreferrer" data-cursor="GitHub">GitHub (ikovlad)</a></li>
+                            <li><a href="./Neri_Vladimir_Resume.pdf" download="Neri_Vladimir_Resume.pdf" data-cursor="PDF">Resume PDF</a></li>
+                            <li class="footer-location-row"><i class="fa-solid fa-location-dot" aria-hidden="true"></i> Rosario, La Union, Philippines</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="footer-bottom">
+                    <a href="#about" class="footer-wordmark" data-cursor="Top">Vlad <span>Neri</span></a>
+                    <span>© 2026 Mikael Vladimir M. Neri. ~ Rosario, La Union | All rights Reserved.</span>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- PROJECT DETAIL MODAL -->
+    <div id="project-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-project-title" hidden>
+        <div class="modal-card">
+            <button type="button" id="close-project-modal" class="modal-close-btn" aria-label="Close project details" data-cursor="Close">&times;</button>
+            <div id="modal-project-preview-wrap" class="modal-preview-frame media-frame" hidden>
+                <img id="modal-project-preview" alt="" referrerpolicy="no-referrer">
+            </div>
+            <p id="modal-project-meta" class="modal-kicker"></p>
+            <h2 id="modal-project-title" class="modal-title"></h2>
+            <p id="modal-project-subtitle" class="modal-subtitle"></p>
+            <p id="modal-project-summary" class="modal-summary"></p>
+            <ul id="modal-project-highlights" class="clean-bullet-list"></ul>
+            <p id="modal-project-stack" class="modal-stack-line"></p>
+            <div id="modal-project-links" class="modal-actions"></div>
+        </div>
+    </div>
+
+    <!-- EMBEDDED VIDEO THEATER MODAL -->
+    <div id="video-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="video-modal-title" hidden>
+        <div class="modal-card modal-card-video">
+            <button type="button" id="close-video-modal" class="modal-close-btn" aria-label="Close video player" data-cursor="Close">&times;</button>
+            <p id="video-modal-platform" class="modal-kicker"></p>
+            <h2 id="video-modal-title" class="modal-title video-modal-heading"></h2>
+            <div id="video-player-stage" class="video-player-stage"></div>
+        </div>
+    </div>
+
+    <!-- CERTIFICATE LIGHTBOX MODAL (IMAGE + METADATA ON CLICK) -->
+    <div id="cert-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="cert-modal-title" hidden>
+        <div class="modal-card modal-card-wide">
+            <button type="button" id="close-cert-modal" class="modal-close-btn" aria-label="Close certificate preview" data-cursor="Close">&times;</button>
+            <p id="cert-modal-meta" class="modal-kicker"></p>
+            <h3 id="cert-modal-title" class="modal-title"></h3>
+            <p id="cert-modal-desc" class="modal-subtitle"></p>
+            <div class="cert-modal-frame media-frame">
+                <img id="cert-modal-img" alt="" class="cert-modal-image" referrerpolicy="no-referrer">
+            </div>
+            <div id="cert-modal-actions" class="modal-actions" hidden></div>
+        </div>
+    </div>
+
+    <!-- 2048 MINI-GAME MODAL -->
+    <div id="game-modal" class="game-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="game-modal-title" hidden>
+        <div class="game-modal-content">
+            <button id="close-game" type="button" class="close-btn" aria-label="Close 2048 game" data-cursor="Close">&times;</button>
+            <div class="game-header">
+                <h2 id="game-modal-title">2048</h2>
+                <div class="score-box tabular-nums">Score: <span id="game-score">0</span></div>
+            </div>
+            <div class="game-grid-wrap">
+                <div class="game-grid" id="game-grid"></div>
+                <div id="game-over-banner" class="game-over-banner" hidden>
+                    <p>Game Over</p>
+                    <span id="game-final-score" class="tabular-nums">Final Score: 0</span>
+                </div>
+            </div>
+            <div class="game-controls">
+                <p class="desktop-hint">Use <strong>Arrow Keys</strong> or buttons below</p>
+                <div class="d-pad">
+                    <div class="space"></div>
+                    <button type="button" class="dir-btn" data-dir="up" aria-label="Move up"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+                    <div class="space"></div>
+                    <button type="button" class="dir-btn" data-dir="left" aria-label="Move left"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i></button>
+                    <button type="button" class="dir-btn" data-dir="down" aria-label="Move down"><i class="fa-solid fa-arrow-down" aria-hidden="true"></i></button>
+                    <button type="button" class="dir-btn" data-dir="right" aria-label="Move right"><i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
+                </div>
+                <button id="reset-game" type="button" class="btn-3d btn-3d-primary game-reset-btn">New Game</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="./assets/app.js"></script>
+</body>
+</html>

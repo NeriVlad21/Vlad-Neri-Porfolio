@@ -1,0 +1,7 @@
+node_modules/
+dist/
+.playwright-cli/
+.aistudio/
+public/assets/aistudio/
+.DS_Store
+*.log
