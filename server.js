@@ -11,8 +11,12 @@ const publicDir = path.join(__dirname, 'public');
 
 app.use(express.static(publicDir));
 
-app.get('*', (_req, res) => {
-  res.sendFile(path.join(publicDir, 'index.html'));
+app.get('*', (req, res) => {
+  const ext = path.extname(req.path).toLowerCase();
+  if (ext && ext !== '.html') {
+    return res.status(404).end();
+  }
+  return res.sendFile(path.join(publicDir, 'index.html'));
 });
 
 app.listen(PORT, '0.0.0.0', () => {

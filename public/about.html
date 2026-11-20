@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>About Vlad Neri — CS Builder, Data &amp; Video (PH)</title>
+    <meta name="description" content="Learn about Mikael Vladimir 'Vlad' Neri — BS Computer Science student (1.77 GWA), Certified Cybersecurity Professional, 2D/3D AI Data Annotator, and Video Editor available Dec 2026 for OJT.">
+    <meta name="theme-color" content="#07080b">
+    <link rel="canonical" href="https://vladneri.mereziko.workers.dev/about.html">
+    <meta property="og:type" content="profile">
+    <meta property="og:site_name" content="Vlad Neri">
+    <meta property="og:url" content="https://vladneri.mereziko.workers.dev/about.html">
+    <meta property="og:title" content="About Vlad Neri — CS Builder, Data &amp; Video (PH)">
+    <meta property="og:description" content="My path through CS studies at PHINMA UPang, FSLAMES offline ML thesis, Remotasks 2D/3D data QA, 1.3M+ social video editing, and Certified Cybersecurity Professional credentials.">
+    <meta property="og:image" content="https://vladneri.mereziko.workers.dev/profile.jpg">
+    <meta property="og:image:alt" content="Portrait of Mikael Vladimir M. Neri">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="About Vlad Neri — CS Builder, Data &amp; Video (PH)">
+    <meta name="twitter:description" content="CS Student (1.77 GWA) &amp; Certified Cybersecurity Professional in Rosario, La Union. Available Dec 2026 (~500-hr OJT).">
+    <meta name="twitter:image" content="https://vladneri.mereziko.workers.dev/profile.jpg">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="manifest" href="/manifest.webmanifest">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="./style.css">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "Mikael Vladimir M. Neri",
+      "alternateName": "Vlad Neri",
+      "jobTitle": "Computer Science Student, Full-Stack Developer & Certified Cybersecurity Professional",
+      "url": "https://vladneri.mereziko.workers.dev/about.html",
+      "image": "https://vladneri.mereziko.workers.dev/profile.jpg",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Rosario",
+        "addressRegion": "La Union",
+        "addressCountry": "PH"
+      },
+      "knowsLanguage": ["English", "Filipino", "Bisaya"],
+      "alumniOf": {
+        "@type": "CollegeOrUniversity",
+        "name": "PHINMA UPang College of Urdaneta"
+      },
+      "sameAs": [
+        "https://www.linkedin.com/in/mikaelvladimir",
+        "https://github.com/NeriVlad21",
+        "https://github.com/ikovlad",
+        "https://www.youtube.com/@TenthTide",
+        "https://g.dev/ikovlad21"
+      ],
+      "hasCredential": [
+        {
+          "@type": "EducationalOccupationalCredential",
+          "name": "Certified Cybersecurity Professional (CCP)",
+          "recognizedBy": {
+            "@type": "Organization",
+            "name": "Appkademiya"
+          },
+          "dateCreated": "2026-10-04",
+          "url": "https://appkademiya.online/verify/CERT-CCP-CYBERSECURITY-PROFESSIONAL-20261004-C1EA4A4F1136"
+        }
+      ]
+    }
+    </script>
+</head>
+<body id="top" class="about-page bg-mode-vladgpt">
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <!-- Shared Starfield Background Canvas -->
+    <canvas id="starfield" aria-hidden="true"></canvas>
+
+    <!-- Lightweight Single-Shape Precision Cursor (Fine-Pointer Desktop Only) -->
+    <div id="llm-cursor" class="llm-cursor" aria-hidden="true">
+        <span class="llm-cursor-dot"></span>
+        <span id="llm-cursor-label" class="llm-cursor-label"></span>
+    </div>
+
+    <!-- Hanging Pull-Chain Light/Dark Theme Toggle -->
+    <button id="theme-toggle" type="button" class="pull-chain theme-toggle-btn" aria-label="Toggle light and dark mode" aria-pressed="false" data-cursor="Theme" title="Pull to toggle light / dark mode">
+        <span class="chain-string"></span>
+        <span class="chain-handle"></span>
+    </button>
+
+    <!-- Mobile / Tablet Backdrop for Sidebar Drawer -->
+    <div id="sidebar-backdrop" class="sidebar-backdrop" hidden></div>
+
+    <div class="app-shell">
+        <!-- Slide-out Navigation Sidebar -->
+        <aside id="llm-sidebar" class="llm-sidebar" aria-label="Site navigation" aria-hidden="true">
+            <div class="sidebar-top">
+                <span class="sidebar-brand-text">Vlad <span>Neri</span></span>
+                <button id="sidebar-close-btn" type="button" class="sidebar-icon-btn" aria-label="Close navigation sidebar" data-cursor="Close" title="Close sidebar">
+                    <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                </button>
+            </div>
+
+            <nav class="sidebar-scroll" aria-label="Primary pages and sections">
+                <a href="./index.html" class="thread-item" data-cursor="Home">
+                    <span class="thread-dot" aria-hidden="true"></span>
+                    <span class="thread-title">Home</span>
+                </a>
+                <a href="./about.html" class="thread-item active" aria-current="page" data-cursor="About">
+                    <span class="thread-dot" aria-hidden="true"></span>
+                    <span class="thread-title">About Me</span>
+                </a>
+                <a href="./index.html#projects" class="thread-item" data-cursor="Projects">
+                    <span class="thread-dot" aria-hidden="true"></span>
+                    <span class="thread-title">Projects (11)</span>
+                </a>
+                <a href="./index.html#experience" class="thread-item" data-cursor="Work">
+                    <span class="thread-dot" aria-hidden="true"></span>
+                    <span class="thread-title">Work &amp; Video Reels</span>
+                </a>
+                <a href="./index.html#education" class="thread-item" data-cursor="Credentials">
+                    <span class="thread-dot" aria-hidden="true"></span>
+                    <span class="thread-title">Credentials &amp; CCP</span>
+                </a>
+                <a href="./index.html?inquiry=Dec%202026%20OJT%20%2F%20Internship#contact" class="thread-item" data-cursor="Contact">
+                    <span class="thread-dot" aria-hidden="true"></span>
+                    <span class="thread-title">Contact &amp; OJT</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="sidebar-meta-line">
+                    <span>Rosario, La Union · PH</span>
+                </div>
+                <div class="sidebar-footer-actions">
+                    <a href="./Neri_Vladimir_Resume.pdf" download="Neri_Vladimir_Resume.pdf" class="sidebar-game-btn" data-cursor="PDF">
+                        <i class="fa-solid fa-file-arrow-down" aria-hidden="true"></i>
+                        <span>Resume PDF</span>
+                    </a>
+                    <div class="sidebar-social-row">
+                        <a href="https://github.com/NeriVlad21" target="_blank" rel="noopener noreferrer" aria-label="Primary GitHub profile (NeriVlad21)" data-cursor="GitHub" title="Primary GitHub (NeriVlad21)">
+                            <i class="fa-brands fa-github" aria-hidden="true"></i>
+                        </a>
+                        <a href="https://www.linkedin.com/in/mikaelvladimir" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn profile" data-cursor="LinkedIn" title="LinkedIn">
+                            <i class="fa-brands fa-linkedin-in" aria-hidden="true"></i>
+                        </a>
+                        <a href="mailto:mereziko@gmail.com" aria-label="Email Vlad Neri" data-cursor="Email" title="Email">
+                            <i class="fa-solid fa-envelope" aria-hidden="true"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <div class="main-stage">
+            <!-- Shared Top Bar with Thin Blue Scroll-Progress Line Underneath -->
+            <header class="top-bar">
+                <button id="brand-nav-trigger" type="button" class="top-bar-brand" aria-label="Scroll to top and toggle navigation sidebar" aria-controls="llm-sidebar" aria-expanded="false" data-cursor="Menu" title="Scroll up & open navigation sidebar">
+                    Vlad <span>Neri</span>
+                </button>
+                <nav class="top-bar-nav" aria-label="Primary navigation">
+                    <a href="./about.html" class="top-nav-desktop-only is-nav-active" aria-current="page" data-cursor="About">About</a>
+                    <a href="./index.html#projects" class="top-nav-desktop-only" data-cursor="Projects">Projects</a>
+                    <a href="./index.html?inquiry=Dec%202026%20OJT%20%2F%20Internship#contact" class="top-bar-cta btn-3d" data-tilt data-cursor="Contact">Let's talk</a>
+                </nav>
+                <div id="scroll-progress-bar" class="scroll-progress-bar about-scroll-progress" aria-hidden="true"></div>
+            </header>
+
+            <main id="main-content" tabindex="-1" class="about-page-stream">
+                <!-- =================================================
+                     1. ABOUT HERO (SHARED 1180px LEFT EDGE + FLOATING PHOTO CHIPS)
+                     ================================================= -->
+                <section class="about-page-section about-hero-split-page" aria-labelledby="about-hero-title">
+                    <div class="about-hero-copy">
+                        <div class="about-hero-breadcrumbs">
+                            <a href="./index.html" class="about-back-link" data-cursor="Home">
+                                <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+                                <span>Back to home</span>
+                            </a>
+                            <span class="about-tag-chip">ABOUT ME</span>
+                        </div>
+
+                        <h1 id="about-hero-title" class="about-hero-headline">
+                            CS builder, AI &amp; data<br>
+                            engineer who <span>ships,</span><br>
+                            edits and secures.
+                        </h1>
+
+                        <p class="about-hero-intro">
+                            I'm Mikael Vladimir "Vlad" Neri — a Computer Science student at PHINMA UPang College of Urdaneta and Certified Cybersecurity Professional (CCP) working across full-stack web apps, offline machine-learning pipelines, Android development, 2D/3D AI data labeling, and high-retention video production.
+                        </p>
+
+                        <div class="about-hero-actions">
+                            <a href="./Neri_Vladimir_Resume.pdf" download="Neri_Vladimir_Resume.pdf" class="btn-3d btn-3d-primary" data-tilt data-cursor="PDF">
+                                <i class="fa-solid fa-file-arrow-down" aria-hidden="true"></i>
+                                <span>Resume PDF</span>
+                            </a>
+                            <a href="./index.html?inquiry=Dec%202026%20OJT%20%2F%20Internship#contact" class="btn-flat btn-flat-navy" data-cursor="Hire">
+                                <span>OJT &amp; Role Inquiry</span>
+                                <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="about-portrait-stage">
+                        <div class="about-portrait-card media-frame">
+                            <img src="./profile.jpg" width="912" height="912" decoding="async" alt="Portrait of Mikael Vladimir M. Neri" referrerpolicy="no-referrer">
+                        </div>
+                        <span class="about-photo-chip about-photo-chip-top">
+                            <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+                            <span>Certified Cybersecurity Professional</span>
+                        </span>
+                        <span class="about-photo-chip about-photo-chip-bottom">
+                            <span class="about-chip-dot" aria-hidden="true"></span>
+                            <span>Open to OJT, Dec 2026</span>
+                        </span>
+                    </div>
+                </section>
+
+                <!-- =================================================
+                     2. OPEN EDITORIAL BODY + STICKY QUICK FACTS SIDEBAR
+                     ================================================= -->
+                <div class="about-editorial-shell">
+                    <div class="about-main-column">
+                        <!-- Story as 4 Chapters (Study, Create, Build, Secure) -->
+                        <section class="about-editorial-block about-chapters-block" aria-labelledby="about-story-heading">
+                            <p class="section-kicker"><i class="fa-solid fa-compass" aria-hidden="true"></i> MY STORY</p>
+                            <h2 id="about-story-heading">Four chapters so far</h2>
+
+                            <ol class="about-chapters-list">
+                                <li class="about-chapter">
+                                    <div class="about-chapter-meta">
+                                        <span class="about-chapter-num tabular-nums" aria-hidden="true">01</span>
+                                        <h3 class="about-chapter-label">Study</h3>
+                                    </div>
+                                    <p class="about-chapter-copy">
+                                        Pursuing BS Computer Science at <strong>PHINMA UPang College of Urdaneta</strong> (2023–expected 2027), maintaining a <strong>1.77 average GWA</strong> (<strong>1.57 best semester</strong>) alongside Zuitt's 80-hour Python, Django &amp; AWS course.
+                                    </p>
+                                </li>
+
+                                <li class="about-chapter">
+                                    <div class="about-chapter-meta">
+                                        <span class="about-chapter-num tabular-nums" aria-hidden="true">02</span>
+                                        <h3 class="about-chapter-label">Create</h3>
+                                    </div>
+                                    <p class="about-chapter-copy">
+                                        Editing short-form video and managing social media since <strong>July 2023</strong> for a <strong>1.3M+ follower Facebook page</strong> and my YouTube channel <strong>TenthTide Vibes</strong> (1.5K+ subscribers).
+                                    </p>
+                                </li>
+
+                                <li class="about-chapter">
+                                    <div class="about-chapter-meta">
+                                        <span class="about-chapter-num tabular-nums" aria-hidden="true">03</span>
+                                        <h3 class="about-chapter-label">Build</h3>
+                                    </div>
+                                    <p class="about-chapter-copy">
+                                        Shipped <strong>FSLAMES</strong> (~5,000 samples, 2 quantized TFLite models), <strong>Jonathan Photography</strong> (tested with <strong>7 real users</strong>), <strong>Filipino Food Recommender</strong> (97 recipes, <strong>100 real users</strong>), and <strong>U-Eat</strong> (<strong>50 testers</strong>, 4.5/5 rating, 90/100 score).
+                                    </p>
+                                </li>
+
+                                <li class="about-chapter">
+                                    <div class="about-chapter-meta">
+                                        <span class="about-chapter-num tabular-nums" aria-hidden="true">04</span>
+                                        <h3 class="about-chapter-label">Secure</h3>
+                                    </div>
+                                    <p class="about-chapter-copy">
+                                        Labeling and QA-ing 2D/3D perception datasets at <strong>Remotasks</strong> with <strong>90% accuracy</strong> since July 2025, backed by Appkademiya's <strong>Certified Cybersecurity Professional (CCP)</strong> credential earned <strong>October 2026</strong>.
+                                    </p>
+                                </li>
+                            </ol>
+                        </section>
+
+                        <!-- 1. WHY ME? (Claim and Proof Ledger) -->
+                        <section class="about-editorial-block about-ledger-block" aria-labelledby="about-whyme-heading">
+                            <p class="section-kicker"><i class="fa-solid fa-check-double" aria-hidden="true"></i> WHY ME?</p>
+                            <h2 id="about-whyme-heading">Claims backed by real proof</h2>
+
+                            <div class="about-ledger" role="list">
+                                <div class="about-ledger-row" role="listitem">
+                                    <p class="about-ledger-claim">I test with real people.</p>
+                                    <div class="about-ledger-proof">
+                                        <p>7 real users on Jonathan Photography, 100 on Filipino Food Recommender, and 50 testers on U-Eat (4.5/5 rating).</p>
+                                        <a href="./index.html#projects" class="about-ledger-link" data-cursor="Projects">See tested projects →</a>
+                                    </div>
+                                </div>
+
+                                <div class="about-ledger-row" role="listitem">
+                                    <p class="about-ledger-claim">I ship end to end.</p>
+                                    <div class="about-ledger-proof">
+                                        <p>11 shipped web, Android, and ML projects—from full-stack studio booking flows to native Kotlin apps and TFLite models.</p>
+                                        <a href="./index.html#projects" class="about-ledger-link" data-cursor="Projects">Browse all 11 builds →</a>
+                                    </div>
+                                </div>
+
+                                <div class="about-ledger-row" role="listitem">
+                                    <p class="about-ledger-claim">I'm careful with data.</p>
+                                    <div class="about-ledger-proof">
+                                        <p>Strict participant-level splits across 131 FSLAMES sign classes (~5,000 samples) and 90% 2D/3D annotation accuracy at Remotasks.</p>
+                                        <a href="./index.html#projects" class="about-ledger-link" data-cursor="FSLAMES">View FSLAMES &amp; data work →</a>
+                                    </div>
+                                </div>
+
+                                <div class="about-ledger-row" role="listitem">
+                                    <p class="about-ledger-claim">I'm ready for remote work.</p>
+                                    <div class="about-ledger-proof">
+                                        <p>Dedicated PC workstation, headset, and fiber internet in Rosario, La Union, with English (C1/C2), Filipino, and Bisaya fluency.</p>
+                                        <a href="./index.html?inquiry=Dec%202026%20OJT%20%2F%20Internship#contact" class="about-ledger-link" data-cursor="OJT">Inquire for Dec 2026 OJT →</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- 2. HOW I BUILD (Connected Stepper) -->
+                        <section class="about-editorial-block about-stepper-block" aria-labelledby="about-build-heading">
+                            <p class="section-kicker"><i class="fa-solid fa-diagram-project" aria-hidden="true"></i> HOW I BUILD</p>
+                            <h2 id="about-build-heading">From brief to shipped</h2>
+
+                            <div class="about-stepper" id="about-stepper">
+                                <div class="about-stepper-line" aria-hidden="true">
+                                    <span class="about-stepper-line-fill"></span>
+                                </div>
+                                <ol class="about-stepper-nodes">
+                                    <li class="about-stepper-step">
+                                        <span class="about-stepper-node tabular-nums" aria-hidden="true">01</span>
+                                        <div class="about-stepper-body">
+                                            <h3>Understand</h3>
+                                            <p>Clarify the workflow, constraints, and data rules before writing code.</p>
+                                        </div>
+                                    </li>
+                                    <li class="about-stepper-step">
+                                        <span class="about-stepper-node tabular-nums" aria-hidden="true">02</span>
+                                        <div class="about-stepper-body">
+                                            <h3>Build</h3>
+                                            <p>Implement full-stack, Android, or ML pipelines with clean structure.</p>
+                                        </div>
+                                    </li>
+                                    <li class="about-stepper-step">
+                                        <span class="about-stepper-node tabular-nums" aria-hidden="true">03</span>
+                                        <div class="about-stepper-body">
+                                            <h3>Test with real users</h3>
+                                            <p>Validate early with real testers to catch friction and edge cases.</p>
+                                        </div>
+                                    </li>
+                                    <li class="about-stepper-step">
+                                        <span class="about-stepper-node tabular-nums" aria-hidden="true">04</span>
+                                        <div class="about-stepper-body">
+                                            <h3>Ship and document</h3>
+                                            <p>Deploy live builds with security hygiene and clear documentation.</p>
+                                        </div>
+                                    </li>
+                                </ol>
+                            </div>
+                        </section>
+
+                        <!-- 3. NOW (Status Panel / Changelog List) -->
+                        <section class="about-editorial-block about-now-block" aria-labelledby="about-now-heading">
+                            <div class="about-now-header">
+                                <div>
+                                    <p class="section-kicker"><i class="fa-solid fa-wave-square" aria-hidden="true"></i> NOW</p>
+                                    <h2 id="about-now-heading">Current focus</h2>
+                                </div>
+                                <span class="about-now-updated tabular-nums">Updated Nov 2026</span>
+                            </div>
+
+                            <ul class="about-now-list">
+                                <li class="about-now-row">
+                                    <span class="about-status-dot" aria-hidden="true"></span>
+                                    <div class="about-now-body">
+                                        <span class="about-now-topic">Cybersecurity hygiene</span>
+                                        <p>Applying Appkademiya CCP and HP LIFE security practices to authentication, access controls, and asset protection across web projects.</p>
+                                    </div>
+                                </li>
+                                <li class="about-now-row">
+                                    <span class="about-status-dot" aria-hidden="true"></span>
+                                    <div class="about-now-body">
+                                        <span class="about-now-topic">ML and data engineering</span>
+                                        <p>Building on FSLAMES sequence modeling and Cisco Data Analytics / Data Science with cleaner ETL pipelines and lightweight TFLite inference.</p>
+                                    </div>
+                                </li>
+                                <li class="about-now-row">
+                                    <span class="about-status-dot" aria-hidden="true"></span>
+                                    <div class="about-now-body">
+                                        <span class="about-now-topic">Full-stack and cloud (AWS)</span>
+                                        <p>Sharpening React, PHP/MySQL, Django, and AWS (EC2, S3, Lambda) workflows from Zuitt's 80-hour course ahead of December 2026 OJT.</p>
+                                    </div>
+                                </li>
+                            </ul>
+                        </section>
+
+                        <!-- 4. RECRUITER FAQ (Accessible One-At-A-Time Accordion) -->
+                        <section class="about-editorial-block about-faq-block" aria-labelledby="about-faq-heading">
+                            <p class="section-kicker"><i class="fa-solid fa-circle-question" aria-hidden="true"></i> RECRUITER FAQ</p>
+                            <h2 id="about-faq-heading">Quick answers</h2>
+
+                            <div class="about-faq-list" id="about-faq-list">
+                                <div class="about-faq-item">
+                                    <h3 class="about-faq-q">
+                                        <button type="button" id="about-faq-btn-1" class="about-faq-trigger" aria-expanded="false" aria-controls="about-faq-panel-1">
+                                            <span>When can you start?</span>
+                                            <i class="fa-solid fa-plus about-faq-icon" aria-hidden="true"></i>
+                                        </button>
+                                    </h3>
+                                    <div id="about-faq-panel-1" class="about-faq-panel" role="region" aria-labelledby="about-faq-btn-1" hidden>
+                                        <p>I am available starting December 2026 for my ~500-hour BS Computer Science OJT (expected graduation 2027), and open now for part-time, freelance, or junior role conversations.</p>
+                                    </div>
+                                </div>
+
+                                <div class="about-faq-item">
+                                    <h3 class="about-faq-q">
+                                        <button type="button" id="about-faq-btn-2" class="about-faq-trigger" aria-expanded="false" aria-controls="about-faq-panel-2">
+                                            <span>Remote or on-site?</span>
+                                            <i class="fa-solid fa-plus about-faq-icon" aria-hidden="true"></i>
+                                        </button>
+                                    </h3>
+                                    <div id="about-faq-panel-2" class="about-faq-panel" role="region" aria-labelledby="about-faq-btn-2" hidden>
+                                        <p>I am open to remote, hybrid, or on-site arrangements. I am based in Rosario, La Union, Philippines (UTC+8) and have worked remotely on AI data annotation and video production since July 2023.</p>
+                                    </div>
+                                </div>
+
+                                <div class="about-faq-item">
+                                    <h3 class="about-faq-q">
+                                        <button type="button" id="about-faq-btn-3" class="about-faq-trigger" aria-expanded="false" aria-controls="about-faq-panel-3">
+                                            <span>What equipment do you have?</span>
+                                            <i class="fa-solid fa-plus about-faq-icon" aria-hidden="true"></i>
+                                        </button>
+                                    </h3>
+                                    <div id="about-faq-panel-3" class="about-faq-panel" role="region" aria-labelledby="about-faq-btn-3" hidden>
+                                        <p>I have a dedicated PC workstation, headset, and fiber internet connection—ready for daily standups, Linux/web/Android development, ML workflows, and video editing.</p>
+                                    </div>
+                                </div>
+
+                                <div class="about-faq-item">
+                                    <h3 class="about-faq-q">
+                                        <button type="button" id="about-faq-btn-4" class="about-faq-trigger" aria-expanded="false" aria-controls="about-faq-panel-4">
+                                            <span>Which languages?</span>
+                                            <i class="fa-solid fa-plus about-faq-icon" aria-hidden="true"></i>
+                                        </button>
+                                    </h3>
+                                    <div id="about-faq-panel-4" class="about-faq-panel" role="region" aria-labelledby="about-faq-btn-4" hidden>
+                                        <p>Spoken: English (C1/C2), Filipino, and Bisaya. Code &amp; tools: Python, JavaScript, PHP, Kotlin, SQL/MySQL, HTML5/CSS3, React, Vite, Django, Jetpack Compose, TensorFlow/TFLite, MediaPipe, Pandas, Firebase, and AWS.</p>
+                                    </div>
+                                </div>
+
+                                <div class="about-faq-item">
+                                    <h3 class="about-faq-q">
+                                        <button type="button" id="about-faq-btn-5" class="about-faq-trigger" aria-expanded="false" aria-controls="about-faq-panel-5">
+                                            <span>Which roles are you open to?</span>
+                                            <i class="fa-solid fa-plus about-faq-icon" aria-hidden="true"></i>
+                                        </button>
+                                    </h3>
+                                    <div id="about-faq-panel-5" class="about-faq-panel" role="region" aria-labelledby="about-faq-btn-5" hidden>
+                                        <p>December 2026 Computer Science OJT (~500 hrs), junior full-stack web developer, Android (Kotlin) developer, AI &amp; 2D/3D data annotation or QA, entry-level cybersecurity roles, and short-form video editing.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- ASK R2-D2 ABOUT ME (4 Prompt Chips Wired to Existing Chat + getReply) -->
+                        <section class="about-editorial-block about-r2-block" aria-labelledby="about-r2-heading">
+                            <p class="section-kicker"><i class="fa-solid fa-robot" aria-hidden="true"></i> ASK R2-D2 ABOUT ME</p>
+                            <h2 id="about-r2-heading">Want the fast version? Ask my droid.</h2>
+                            <p class="about-r2-sub">Click a prompt below to open R2-D2 and send the question right away.</p>
+                            <div class="about-r2-chips" role="group" aria-label="Ask R2-D2 about Vlad">
+                                <button type="button" class="about-r2-chip" data-r2-question="Why should we hire Vlad?">Why should we hire Vlad?</button>
+                                <button type="button" class="about-r2-chip" data-r2-question="What's his strongest project?">What's his strongest project?</button>
+                                <button type="button" class="about-r2-chip" data-r2-question="Is he available for OJT?">Is he available for OJT?</button>
+                                <button type="button" class="about-r2-chip" data-r2-question="Tell me a joke">Tell me a joke</button>
+                            </div>
+                        </section>
+                    </div>
+
+                    <!-- Sticky Quick Facts Sidebar (Desktop >= 1024px) / 2-Column Strip Under Hero (Mobile/Tablet) -->
+                    <aside class="about-facts-sidebar" aria-label="Quick facts">
+                        <p class="about-facts-kicker">QUICK FACTS</p>
+
+                        <dl class="about-facts-list">
+                            <div class="about-fact-row about-fact-location">
+                                <dt>Based in</dt>
+                                <dd>
+                                    <span>Rosario, La Union, PH (UTC+8)</span>
+                                    <span id="about-local-time" class="about-fact-time tabular-nums"></span>
+                                </dd>
+                            </div>
+                            <div class="about-fact-row">
+                                <dt>Availability</dt>
+                                <dd>Dec 2026, ~500-hr OJT</dd>
+                            </div>
+                            <div class="about-fact-row">
+                                <dt>Open to</dt>
+                                <dd>Remote, Hybrid or On-site</dd>
+                            </div>
+                            <div class="about-fact-row">
+                                <dt>Languages</dt>
+                                <dd>English (C1/C2), Filipino, Bisaya</dd>
+                            </div>
+                            <div class="about-fact-row">
+                                <dt>Reply time</dt>
+                                <dd>within 24 hours</dd>
+                            </div>
+                        </dl>
+
+                        <div class="about-facts-actions">
+                            <a href="./Neri_Vladimir_Resume.pdf" download="Neri_Vladimir_Resume.pdf" class="btn-3d btn-3d-primary about-fact-action-btn" data-tilt data-cursor="PDF">
+                                <i class="fa-solid fa-file-arrow-down" aria-hidden="true"></i>
+                                <span>Resume PDF</span>
+                            </a>
+                            <button type="button" id="about-copy-email" class="btn-flat btn-flat-navy about-fact-action-btn" data-email="mereziko@gmail.com" data-cursor="Copy">
+                                <i class="fa-regular fa-copy" aria-hidden="true"></i>
+                                <span>Copy email</span>
+                            </button>
+                            <span id="about-copy-status" class="about-sr-only" role="status" aria-live="polite"></span>
+                        </div>
+                    </aside>
+                </div>
+
+                <!-- =================================================
+                     3. FULL-WIDTH OPEN "LET'S WORK TOGETHER" BAND (NO CARD BOX)
+                     ================================================= -->
+                <section class="about-cta-band" aria-labelledby="about-cta-heading">
+                    <div class="about-cta-band-copy">
+                        <p class="section-kicker"><i class="fa-solid fa-paper-plane" aria-hidden="true"></i> NEXT STEP</p>
+                        <h2 id="about-cta-heading">Let's work together</h2>
+                        <p>
+                            Seeking a ~500-hour Computer Science OJT starting December 2026 (Remote, Hybrid or On-site) as well as junior web, AI/data, or video roles. Tell me what your team needs.
+                        </p>
+                    </div>
+                    <div class="about-cta-buttons">
+                        <a href="./index.html?inquiry=Dec%202026%20OJT%20%2F%20Internship#contact" class="btn-3d btn-3d-primary" data-tilt data-cursor="Message">
+                            <span>Message me →</span>
+                        </a>
+                        <a href="./index.html#projects" class="btn-flat btn-flat-navy" data-cursor="Projects">
+                            <span>See my work</span>
+                        </a>
+                    </div>
+                </section>
+            </main>
+
+            <!-- =================================================
+                 SHARED FOOTER (MATCHING HOMEPAGE)
+                 ================================================= -->
+            <footer class="site-footer">
+                <div class="footer-grid-3">
+                    <div class="footer-col">
+                        <h3>Navigate</h3>
+                        <ul class="footer-link-list">
+                            <li><a href="./index.html" data-cursor="Home">Home</a></li>
+                            <li><a href="./about.html" aria-current="page" data-cursor="About">About Me</a></li>
+                            <li><a href="./index.html#tech-stack" data-cursor="Stack">Tech Stack</a></li>
+                            <li><a href="./index.html#projects" data-cursor="Projects">Projects</a></li>
+                            <li><a href="./index.html#experience" data-cursor="Work">Experience &amp; Reels</a></li>
+                            <li><a href="./index.html#education" data-cursor="Credentials">Credentials</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="footer-col">
+                        <h3>What I do</h3>
+                        <ul class="footer-text-list">
+                            <li>AI &amp; Data Pipelines</li>
+                            <li>Full-Stack Web Development</li>
+                            <li>Android Apps (Kotlin &amp; Compose)</li>
+                            <li>Short-Form Video &amp; Motion</li>
+                            <li>Cybersecurity (CCP)</li>
+                        </ul>
+                    </div>
+
+                    <div class="footer-col">
+                        <h3>Contact</h3>
+                        <ul class="footer-link-list">
+                            <li><a href="mailto:mereziko@gmail.com" data-cursor="Email">Email</a></li>
+                            <li><a href="https://www.linkedin.com/in/mikaelvladimir" target="_blank" rel="noopener noreferrer" data-cursor="LinkedIn">LinkedIn</a></li>
+                            <li><a href="https://github.com/NeriVlad21" target="_blank" rel="noopener noreferrer" data-cursor="GitHub">GitHub — NeriVlad21 <span class="footer-gh-tag">(Primary)</span></a></li>
+                            <li><a href="https://github.com/ikovlad" target="_blank" rel="noopener noreferrer" data-cursor="GitHub">GitHub — ikovlad <span class="footer-gh-tag">(Academic Archive)</span></a></li>
+                            <li><a href="./Neri_Vladimir_Resume.pdf" download="Neri_Vladimir_Resume.pdf" data-cursor="PDF">Resume PDF</a></li>
+                            <li class="footer-location-row"><i class="fa-solid fa-location-dot" aria-hidden="true"></i> Rosario, La Union, Philippines</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="footer-bottom">
+                    <a href="./index.html" class="footer-wordmark" data-cursor="Home">Vlad <span>Neri</span></a>
+                    <div class="footer-bottom-right">
+                        <span>© 2026 Mikael Vladimir M. Neri. ~ Rosario, La Union | All rights Reserved.</span>
+                        <a href="#top" class="footer-back-top" data-cursor="Top">Back to top ↑</a>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <script type="module" src="./assets/app.js"></script>
+    <script>
+        (function () {
+            var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+            // 1. Live Rosario, La Union (UTC+8 / Asia/Manila) local time, updated every minute
+            var timeEl = document.getElementById('about-local-time');
+            function formatManilaTime() {
+                try {
+                    return new Intl.DateTimeFormat('en-US', {
+                        timeZone: 'Asia/Manila',
+                        hour: 'numeric',
+                        minute: '2-digit',
+                        hour12: true
+                    }).format(new Date());
+                } catch (e) {
+                    var now = new Date();
+                    var utcMs = now.getTime() + now.getTimezoneOffset() * 60000;
+                    var ph = new Date(utcMs + 8 * 3600000);
+                    var h = ph.getHours();
+                    var m = String(ph.getMinutes()).padStart(2, '0');
+                    var suffix = h >= 12 ? 'PM' : 'AM';
+                    var h12 = h % 12 || 12;
+                    return h12 + ':' + m + ' ' + suffix;
+                }
+            }
+
+            function renderManilaTime() {
+                if (!timeEl) return;
+                timeEl.textContent = 'Local time · ' + formatManilaTime();
+            }
+
+            if (timeEl) {
+                renderManilaTime();
+                var msToNextMinute = (60 - new Date().getSeconds()) * 1000 + 50;
+                setTimeout(function () {
+                    renderManilaTime();
+                    setInterval(renderManilaTime, 60000);
+                }, msToNextMinute);
+            }
+
+            // 2. Quick Facts "Copy email" button with 1.5s feedback
+            var copyBtn = document.getElementById('about-copy-email');
+            var copyStatus = document.getElementById('about-copy-status');
+            if (copyBtn) {
+                var copyTimer = null;
+                copyBtn.addEventListener('click', function () {
+                    var email = copyBtn.getAttribute('data-email') || 'mereziko@gmail.com';
+                    var labelEl = copyBtn.querySelector('span');
+                    var iconEl = copyBtn.querySelector('i');
+
+                    function showCopied() {
+                        if (copyTimer) clearTimeout(copyTimer);
+                        copyBtn.classList.add('is-copied');
+                        if (labelEl) labelEl.textContent = 'Copied';
+                        if (iconEl) iconEl.className = 'fa-solid fa-check';
+                        if (copyStatus) copyStatus.textContent = 'Email copied: ' + email;
+                        copyTimer = setTimeout(function () {
+                            copyBtn.classList.remove('is-copied');
+                            if (labelEl) labelEl.textContent = 'Copy email';
+                            if (iconEl) iconEl.className = 'fa-regular fa-copy';
+                        }, 1500);
+                    }
+
+                    function fallbackCopy() {
+                        var ta = document.createElement('textarea');
+                        ta.value = email;
+                        ta.setAttribute('readonly', '');
+                        ta.style.position = 'fixed';
+                        ta.style.opacity = '0';
+                        document.body.appendChild(ta);
+                        ta.select();
+                        var ok = false;
+                        try {
+                            ok = document.execCommand('copy');
+                        } catch (err) {
+                            ok = false;
+                        }
+                        document.body.removeChild(ta);
+                        if (ok) showCopied();
+                    }
+
+                    if (navigator.clipboard && window.isSecureContext) {
+                        navigator.clipboard.writeText(email).then(showCopied, fallbackCopy);
+                    } else {
+                        fallbackCopy();
+                    }
+                });
+            }
+
+            // 3. One-time fade-in for Story Chapters (visible by default; off under reduced motion)
+            var chapters = document.querySelectorAll('.about-chapter');
+            if (!reduced && 'IntersectionObserver' in window && chapters.length > 0) {
+                var observer = new IntersectionObserver(
+                    function (entries) {
+                        entries.forEach(function (entry) {
+                            if (entry.isIntersecting) {
+                                entry.target.classList.remove('is-chapter-pending');
+                                entry.target.classList.add('is-chapter-visible');
+                                observer.unobserve(entry.target);
+                            }
+                        });
+                    },
+                    { threshold: 0.12, rootMargin: '0px 0px -36px 0px' }
+                );
+
+                chapters.forEach(function (chapter) {
+                    var rect = chapter.getBoundingClientRect();
+                    if (rect.top > window.innerHeight * 0.96) {
+                        chapter.classList.add('is-chapter-pending');
+                        observer.observe(chapter);
+                    }
+                });
+
+                setTimeout(function () {
+                    chapters.forEach(function (chapter) {
+                        if (chapter.getBoundingClientRect().top < window.innerHeight + 60) {
+                            chapter.classList.remove('is-chapter-pending');
+                            chapter.classList.add('is-chapter-visible');
+                            observer.unobserve(chapter);
+                        }
+                    });
+                }, 1400);
+            }
+
+            // 4. Connected Stepper: fill glowing line as it scrolls into view (immediately filled under reduced motion)
+            var stepperEl = document.getElementById('about-stepper');
+            if (stepperEl) {
+                var stepNodes = Array.from(stepperEl.querySelectorAll('.about-stepper-step'));
+                var stepperLineEl = stepperEl.querySelector('.about-stepper-line');
+                var stepCircles = Array.from(stepperEl.querySelectorAll('.about-stepper-node'));
+
+                var syncStepperLineGeometry = function () {
+                    if (!stepperLineEl || stepCircles.length < 2) return;
+                    if (window.innerWidth <= 767) {
+                        var parentRect = stepperEl.getBoundingClientRect();
+                        var firstRect = stepCircles[0].getBoundingClientRect();
+                        var lastRect = stepCircles[stepCircles.length - 1].getBoundingClientRect();
+                        var topOffset = firstRect.top - parentRect.top + firstRect.height / 2;
+                        var heightSpan = Math.max(0, lastRect.top + lastRect.height / 2 - (firstRect.top + firstRect.height / 2));
+                        stepperLineEl.style.top = Math.round(topOffset) + 'px';
+                        stepperLineEl.style.bottom = 'auto';
+                        stepperLineEl.style.height = Math.round(heightSpan) + 'px';
+                    } else {
+                        stepperLineEl.style.top = '';
+                        stepperLineEl.style.bottom = '';
+                        stepperLineEl.style.height = '';
+                    }
+                };
+
+                var applyStepProgress = function (progress) {
+                    var clamped = Math.max(0, Math.min(1, progress));
+                    stepperEl.style.setProperty('--stepper-progress', clamped.toFixed(3));
+                    stepNodes.forEach(function (node, idx) {
+                        var threshold = idx === 0 ? 0.05 : idx / Math.max(1, stepNodes.length - 1);
+                        node.classList.toggle('is-step-active', clamped >= threshold - 0.06);
+                    });
+                };
+
+                syncStepperLineGeometry();
+                window.addEventListener('resize', syncStepperLineGeometry, { passive: true });
+                if (document.fonts && document.fonts.ready) {
+                    document.fonts.ready.then(syncStepperLineGeometry);
+                }
+
+                if (reduced) {
+                    applyStepProgress(1);
+                } else {
+                    var maxProgress = 0;
+                    var syncStepper = function () {
+                        var rect = stepperEl.getBoundingClientRect();
+                        var vh = window.innerHeight || 800;
+                        var startY = vh * 0.92;
+                        var endY = vh * 0.36;
+                        var raw = (startY - rect.top) / Math.max(1, startY - endY);
+                        var next = Math.max(0, Math.min(1, raw));
+                        if (next > maxProgress) {
+                            maxProgress = next;
+                            applyStepProgress(maxProgress);
+                        }
+                    };
+                    applyStepProgress(0);
+                    syncStepper();
+                    var stepperTicking = false;
+                    window.addEventListener(
+                        'scroll',
+                        function () {
+                            if (maxProgress >= 1 || stepperTicking) return;
+                            stepperTicking = true;
+                            requestAnimationFrame(function () {
+                                syncStepper();
+                                stepperTicking = false;
+                            });
+                        },
+                        { passive: true }
+                    );
+                    window.addEventListener('resize', syncStepper, { passive: true });
+                }
+            }
+
+            // 5. Recruiter FAQ Accordion (keyboard accessible, one open at a time)
+            var faqTriggers = Array.from(document.querySelectorAll('#about-faq-list .about-faq-trigger'));
+            if (faqTriggers.length > 0) {
+                var setFaqOpen = function (activeBtn) {
+                    var willOpen = activeBtn.getAttribute('aria-expanded') !== 'true';
+                    faqTriggers.forEach(function (btn) {
+                        var isThis = btn === activeBtn && willOpen;
+                        btn.setAttribute('aria-expanded', String(isThis));
+                        var panelId = btn.getAttribute('aria-controls');
+                        var panel = panelId ? document.getElementById(panelId) : null;
+                        if (panel) panel.hidden = !isThis;
+                        var item = btn.closest('.about-faq-item');
+                        if (item) item.classList.toggle('is-open', isThis);
+                    });
+                };
+
+                faqTriggers.forEach(function (btn, idx) {
+                    btn.addEventListener('click', function () {
+                        setFaqOpen(btn);
+                    });
+                    btn.addEventListener('keydown', function (e) {
+                        var targetIdx = null;
+                        if (e.key === 'ArrowDown') targetIdx = (idx + 1) % faqTriggers.length;
+                        else if (e.key === 'ArrowUp') targetIdx = (idx - 1 + faqTriggers.length) % faqTriggers.length;
+                        else if (e.key === 'Home') targetIdx = 0;
+                        else if (e.key === 'End') targetIdx = faqTriggers.length - 1;
+                        if (targetIdx !== null) {
+                            e.preventDefault();
+                            faqTriggers[targetIdx].focus();
+                        }
+                    });
+                });
+            }
+
+            // 6. Ask R2-D2 About Me chips: open existing R2-D2 chat and submit prompt through existing getReply flow
+            var r2Chips = document.querySelectorAll('.about-r2-chip[data-r2-question]');
+            r2Chips.forEach(function (chip) {
+                chip.addEventListener('click', function () {
+                    var question = chip.getAttribute('data-r2-question');
+                    if (!question) return;
+
+                    var trigger = document.getElementById('mascot-trigger');
+                    var chat = document.getElementById('mascot-chat');
+                    var form = document.getElementById('mascot-form');
+                    var input = document.getElementById('mascot-input');
+                    if (!trigger || !chat || !form || !input) return;
+
+                    if (chat.hidden) {
+                        trigger.click();
+                    }
+
+                    requestAnimationFrame(function () {
+                        if (input.disabled) return;
+                        input.value = question;
+                        form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+                    });
+                });
+            });
+        })();
+    </script>
+</body>
+</html>

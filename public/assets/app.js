@@ -4,25 +4,37 @@ import {
   SECTION_THEMES,
   PROJECTS,
   MEDIA_SHOWCASE,
+  CONTACT_COOLDOWN_MS,
+  CONTACT_TIMEOUT_MS,
+  MAX_CONTACT_MESSAGE_LENGTH,
   filterProjects,
   getProjectById,
   computeActiveSectionId,
+  getInquiryPlaceholder,
   buildInquiryPayload,
+  validateContactField,
+  validateInquiryFields,
+  resolveInquiryFromSearch,
+  submitInquiryRequest,
   moveBoardMatrix,
   isBoardGameOver,
 } from './portfolio-logic.js';
+import { initMascot } from './mascot.js';
+
+const FORM_ENDPOINT = "https://REPLACE-WITH-MY-ENDPOINT";
 
 document.addEventListener('DOMContentLoaded', () => {
   const body = document.body;
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
-  // Helper: Loading Shimmer Removal & Failsafe when images finish or fail
+  // Helper: Clean failsafe handler when images finish loading or fail
   const wireMediaFrame = (container) => {
     if (!container) return;
     const img = container.querySelector('img');
     if (!img) return;
-    const done = () => {
+    container.classList.remove('is-loading');
+    const syncState = () => {
       container.classList.remove('is-loading');
       if (img.complete && img.naturalWidth === 0 && img.getAttribute('src')) {
         container.classList.add('is-broken');
@@ -31,13 +43,11 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     };
     if (img.complete) {
-      done();
+      syncState();
       return;
     }
-    container.classList.add('is-loading');
-    img.addEventListener('load', done, { once: true });
-    img.addEventListener('error', done, { once: true });
-    setTimeout(() => container.classList.remove('is-loading'), 1200);
+    img.addEventListener('load', syncState, { once: true });
+    img.addEventListener('error', syncState, { once: true });
   };
 
   for (const frame of document.querySelectorAll('.media-frame')) {
@@ -54,7 +64,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const isCompact =
       el.classList.contains('btn-3d') ||
-      el.classList.contains('stack-node-btn') ||
       el.classList.contains('contact-squircle-badge');
     const maxDeg = isCompact ? 3.5 : 1.7;
 
@@ -132,7 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // =======================================================================
-  // 2. PULL-CHAIN THEME TOGGLE (OBSIDIAN NIGHT <-> ICE CREAM DAY)
+  // 2. PULL-CHAIN THEME TOGGLE (OBSIDIAN NIGHT <-> LIGHT MODE)
   // =======================================================================
   const themeToggle = document.getElementById('theme-toggle');
   if (localStorage.getItem('theme') === 'light') {
@@ -151,7 +160,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // =======================================================================
-  // 3. DUAL-MODE STARFIELD: 30% FASTER STAR WARS WARP + VLADGPT SKY
+  // 3. DUAL-MODE STARFIELD: STAR WARS WARP + VLADGPT SKY (PAUSED UNDER REDUCED MOTION)
   // =======================================================================
   const canvas = document.getElementById('starfield');
   const progressBar = document.getElementById('scroll-progress-bar');
@@ -175,7 +184,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let lastFrameTime = 0;
     let rafId = null;
     let currentSpeed = activeBgTheme.speed;
-    let warpOpacity = 1;
+    let warpOpacity = body.classList.contains('about-page') ? 0.25 : 1;
 
     const createWarpStar = () => ({
       x: (Math.random() - 0.5) * width * 1.75,
@@ -222,7 +231,6 @@ document.addEventListener('DOMContentLoaded', () => {
         currentSpeed += (activeBgTheme.speed - currentSpeed) * 0.08;
         warpOpacity += (targetWarp - warpOpacity) * 0.07;
 
-        // Subtle vladgpt.page.gd twinkling dots backdrop (prominent in lower sections)
         const dotWeight = 1 - warpOpacity * 0.65;
         if (dotWeight > 0.05) {
           for (const d of ambientStars) {
@@ -250,7 +258,6 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         }
 
-        // 30% faster Star Wars warp lines (dominant in landing & tech stack sections)
         if (warpOpacity > 0.08) {
           for (const s of warpStars) {
             if (!reducedMotion) {
@@ -314,35 +321,86 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // =======================================================================
-  // 4. SCROLL-TRIGGERED SECTION & CARD REVEALS
+  // 4. SAFE PROGRESSIVE SCROLL REVEALS (VISIBLE BY DEFAULT)
   // =======================================================================
   const revealTargets = Array.from(document.querySelectorAll('.reveal-block'));
-  const observeReveals = (elements) => {
-    if (reducedMotion || !('IntersectionObserver' in window)) {
-      for (const el of elements) el.classList.add('is-revealed');
-      return null;
-    }
+  for (const el of revealTargets) {
+    el.classList.add('is-revealed');
+  }
 
-    const observer = new IntersectionObserver(
+  // Experience timeline entries: visible by default & without JS; progressive once-on-scroll slide/fade
+  const timelineItems = Array.from(document.querySelectorAll('.exp-timeline-item'));
+  if (timelineItems.length > 0 && !reducedMotion && 'IntersectionObserver' in window) {
+    const timelineObserver = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('is-revealed');
-            observer.unobserve(entry.target);
-          }
+          if (!entry.isIntersecting) continue;
+          entry.target.classList.remove('is-tl-pending');
+          timelineObserver.unobserve(entry.target);
         }
       },
-      { threshold: 0.08, rootMargin: '0px 0px -30px 0px' }
+      { threshold: 0.15, rootMargin: '0px 0px -30px 0px' }
     );
 
-    for (const el of elements) observer.observe(el);
-    return observer;
-  };
-
-  const revealObserver = observeReveals(revealTargets);
+    for (const item of timelineItems) {
+      const rect = item.getBoundingClientRect();
+      if (rect.top > window.innerHeight * 0.94) {
+        item.classList.add('is-tl-pending');
+        timelineObserver.observe(item);
+      }
+    }
+  }
 
   // =======================================================================
-  // 5. LIGHTWEIGHT SINGLE-SHAPE PRECISION CURSOR (NO DOUBLE CIRCLES)
+  // 5. ABOUT PAGE STATS COUNTER ANIMATION ON VIEW
+  // =======================================================================
+  const statCounters = Array.from(document.querySelectorAll('.about-stat-num[data-count-to]'));
+  if (statCounters.length > 0) {
+    const renderFinalStat = (el) => {
+      const target = Number(el.getAttribute('data-count-to') || '0');
+      const prefix = el.getAttribute('data-prefix') || '';
+      const suffix = el.getAttribute('data-suffix') || '';
+      el.textContent = `${prefix}${target}${suffix}`;
+    };
+
+    if (reducedMotion || !('IntersectionObserver' in window)) {
+      for (const el of statCounters) renderFinalStat(el);
+    } else {
+      const statsObserver = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (!entry.isIntersecting) continue;
+            const el = entry.target;
+            statsObserver.unobserve(el);
+            const target = Number(el.getAttribute('data-count-to') || '0');
+            const startFrom = Number(el.getAttribute('data-count-from') || '0');
+            const prefix = el.getAttribute('data-prefix') || '';
+            const suffix = el.getAttribute('data-suffix') || '';
+            const startTime = performance.now();
+            const duration = 680;
+
+            const step = (now) => {
+              const t = Math.min(1, (now - startTime) / duration);
+              const eased = 1 - Math.pow(1 - t, 3);
+              const current = Math.round(startFrom + (target - startFrom) * eased);
+              el.textContent = `${prefix}${current}${suffix}`;
+              if (t < 1) {
+                requestAnimationFrame(step);
+              } else {
+                renderFinalStat(el);
+              }
+            };
+            requestAnimationFrame(step);
+          }
+        },
+        { threshold: 0.25 }
+      );
+      for (const el of statCounters) statsObserver.observe(el);
+    }
+  }
+
+  // =======================================================================
+  // 6. LIGHTWEIGHT SINGLE-SHAPE PRECISION CURSOR (NO DOUBLE CIRCLES)
   // =======================================================================
   const llmCursor = document.getElementById('llm-cursor');
   const llmCursorLabel = document.getElementById('llm-cursor-label');
@@ -412,34 +470,93 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // =======================================================================
-  // 6. NAVBAR NAME TRIGGER (SCROLL TOP + TOGGLE SIDEBAR) & THREAD SYNC
+  // 7. NAVBAR BRAND TRIGGER, SIDEBAR DRAWER, THREAD SYNC & STICKY HIRE PILL
   // =======================================================================
   const sidebarEl = document.getElementById('llm-sidebar');
   const brandNavTrigger = document.getElementById('brand-nav-trigger');
   const sidebarCloseBtn = document.getElementById('sidebar-close-btn');
   const sidebarBackdrop = document.getElementById('sidebar-backdrop');
-  const threadLinks = Array.from(document.querySelectorAll('.thread-item[data-section]'));
+  const threadLinks = Array.from(document.querySelectorAll('.thread-item'));
   const scrollSections = Array.from(document.querySelectorAll('[data-scroll-section]'));
 
-  const setSidebarOpen = (open) => {
+  const FOCUSABLE_SELECTOR =
+    'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+  const getFocusableElements = (container) => {
+    if (!container) return [];
+    return Array.from(container.querySelectorAll(FOCUSABLE_SELECTOR)).filter(
+      (el) => !el.hidden && el.offsetParent !== null
+    );
+  };
+
+  const trapTabFocus = (container, event) => {
+    if (event.key !== 'Tab' || !container) return;
+    const focusables = getFocusableElements(container);
+    if (focusables.length === 0) {
+      event.preventDefault();
+      return;
+    }
+    const first = focusables[0];
+    const last = focusables[focusables.length - 1];
+    if (event.shiftKey) {
+      if (document.activeElement === first || !container.contains(document.activeElement)) {
+        event.preventDefault();
+        last.focus();
+      }
+    } else if (document.activeElement === last || !container.contains(document.activeElement)) {
+      event.preventDefault();
+      first.focus();
+    }
+  };
+
+  let sidebarOpener = null;
+
+  const setSidebarOpen = (open, { restoreFocus = false } = {}) => {
+    const wasOpen = body.classList.contains('sidebar-open');
     body.classList.toggle('sidebar-open', open);
-    if (sidebarEl) sidebarEl.setAttribute('aria-hidden', String(!open));
+    if (sidebarEl) {
+      sidebarEl.setAttribute('aria-hidden', String(!open));
+      if ('inert' in sidebarEl) sidebarEl.inert = !open;
+    }
     if (brandNavTrigger) brandNavTrigger.setAttribute('aria-expanded', String(open));
     if (sidebarBackdrop) sidebarBackdrop.hidden = !open;
+
+    if (open && !wasOpen) {
+      sidebarOpener = document.activeElement instanceof HTMLElement ? document.activeElement : brandNavTrigger;
+      requestAnimationFrame(() => {
+        const focusables = getFocusableElements(sidebarEl);
+        (sidebarCloseBtn || focusables[0])?.focus();
+      });
+    } else if (!open && wasOpen && restoreFocus) {
+      (sidebarOpener || brandNavTrigger)?.focus();
+      sidebarOpener = null;
+    }
   };
 
   setSidebarOpen(false);
 
   if (brandNavTrigger) {
     brandNavTrigger.addEventListener('click', () => {
-      window.scrollTo({ top: 0, behavior: reducedMotion ? 'auto' : 'smooth' });
       const next = !body.classList.contains('sidebar-open');
-      setSidebarOpen(next);
+      if (next) {
+        window.scrollTo({ top: 0, behavior: reducedMotion ? 'auto' : 'smooth' });
+      }
+      setSidebarOpen(next, { restoreFocus: !next });
     });
   }
 
-  if (sidebarCloseBtn) sidebarCloseBtn.addEventListener('click', () => setSidebarOpen(false));
-  if (sidebarBackdrop) sidebarBackdrop.addEventListener('click', () => setSidebarOpen(false));
+  if (sidebarCloseBtn) {
+    sidebarCloseBtn.addEventListener('click', () => setSidebarOpen(false, { restoreFocus: true }));
+  }
+  if (sidebarBackdrop) {
+    sidebarBackdrop.addEventListener('click', () => setSidebarOpen(false, { restoreFocus: true }));
+  }
+
+  if (sidebarEl) {
+    for (const socialLink of sidebarEl.querySelectorAll('a:not(.thread-item)')) {
+      socialLink.addEventListener('click', () => setSidebarOpen(false));
+    }
+  }
 
   window.addEventListener('resize', updateScrollProgress);
 
@@ -450,8 +567,11 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   const setActiveThread = (sectionId) => {
+    if (scrollSections.length === 0) return;
     for (const link of threadLinks) {
-      const match = link.getAttribute('data-section') === sectionId;
+      const targetSec = link.getAttribute('data-section');
+      if (!targetSec) continue;
+      const match = targetSec === sectionId;
       link.classList.toggle('active', match);
       if (match) link.setAttribute('aria-current', 'location');
       else link.removeAttribute('aria-current');
@@ -461,24 +581,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
   for (const link of threadLinks) {
     link.addEventListener('click', (e) => {
-      const id = link.getAttribute('data-section');
+      const href = link.getAttribute('href') || '';
+      if (!href.startsWith('#')) {
+        setSidebarOpen(false);
+        return;
+      }
+      const id = href.slice(1);
       const target = id ? document.getElementById(id) : null;
       if (target) {
         e.preventDefault();
         target.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' });
         setActiveThread(id);
         setSidebarOpen(false);
+      } else {
+        setSidebarOpen(false);
       }
     });
   }
 
   const updateScrollSpy = () => {
-    const rects = scrollSections.map((el) => ({
-      id: el.id,
-      top: el.getBoundingClientRect().top + window.scrollY,
-    }));
-    const activeId = computeActiveSectionId(rects, window.scrollY, 200);
-    if (activeId) setActiveThread(activeId);
+    if (scrollSections.length > 0) {
+      const rects = scrollSections.map((el) => ({
+        id: el.id,
+        top: el.getBoundingClientRect().top + window.scrollY,
+      }));
+      const activeId = computeActiveSectionId(rects, window.scrollY, 200);
+      if (activeId) setActiveThread(activeId);
+    }
     updateScrollProgress();
   };
 
@@ -499,82 +628,255 @@ document.addEventListener('DOMContentLoaded', () => {
   updateScrollSpy();
 
   // =======================================================================
-  // 7. INTERACTIVE TECH STACK ICON DOCK + INLINE DETAIL & CATEGORY SYNC
+  // 8. INTERACTIVE TECH STACK LOGO SLIDESHOW & ON-CLICK DETAIL PANEL
   // =======================================================================
-  const stackRack = document.getElementById('stack-rack');
-  const tooltipName = document.getElementById('stack-tooltip-name');
-  const tooltipRole = document.getElementById('stack-tooltip-role');
-  const tooltipDetail = document.getElementById('stack-tooltip-detail');
-  const stackGroups = Array.from(document.querySelectorAll('.stack-group[data-group]'));
+  const marqueeViewport = document.getElementById('stack-marquee');
+  const marqueeDrag = document.getElementById('stack-marquee-drag');
+  const marqueeTrack = document.getElementById('stack-marquee-track');
+  const detailPanel = document.getElementById('stack-detail-panel');
+  const detailIcon = document.getElementById('stack-detail-icon');
+  const detailName = document.getElementById('stack-detail-name');
+  const detailDesc = document.getElementById('stack-detail-desc');
+  const detailProjectsRow = document.getElementById('stack-detail-projects-row');
+  const detailPills = document.getElementById('stack-detail-pills');
+  const detailCloseBtn = document.getElementById('stack-detail-close');
 
-  if (stackRack && Array.isArray(TECH_STACK_NODES)) {
-    const stackNodeEntries = [];
+  let activeTechId = null;
+  let lastStackTrigger = null;
+  let jumpHighlightTimer = null;
+  let ensureAllProjectsVisible = null;
 
-    const setActiveStackNode = (node, btnEl) => {
-      for (const entry of stackNodeEntries) {
-        const isCurrent = entry.btn === btnEl;
-        entry.btn.classList.toggle('is-active', isCurrent);
-        entry.btn.setAttribute('aria-selected', String(isCurrent));
-      }
-      if (tooltipName) tooltipName.textContent = node.name;
-      if (tooltipRole) tooltipRole.textContent = node.role;
-      if (tooltipDetail) tooltipDetail.textContent = node.details || '';
-      for (const groupEl of stackGroups) {
-        groupEl.classList.toggle('is-group-active', groupEl.dataset.group === node.groupId);
-      }
-    };
+  const renderTechGlyph = (container, node) => {
+    container.innerHTML = '';
+    container.style.color = node.color || 'var(--text-main)';
+    if (node.svg) {
+      container.innerHTML = node.svg;
+    } else if (node.icon) {
+      const i = document.createElement('i');
+      i.className = node.icon;
+      i.setAttribute('aria-hidden', 'true');
+      container.appendChild(i);
+    }
+  };
 
-    TECH_STACK_NODES.forEach((node, idx) => {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = `stack-node-btn${idx === 2 ? ' is-active' : ''}`;
-      btn.dataset.nodeId = node.id;
-      btn.setAttribute('role', 'option');
-      btn.setAttribute('aria-selected', String(idx === 2));
-      btn.setAttribute('aria-label', `${node.name} — ${node.role}`);
-      btn.setAttribute('data-cursor', node.name);
-      btn.setAttribute('data-tilt', '');
+  const scrollToProjectCard = (projectId) => {
+    let targetCard = document.getElementById(`project-${projectId}`);
+    if (!targetCard && typeof ensureAllProjectsVisible === 'function') {
+      ensureAllProjectsVisible();
+      targetCard = document.getElementById(`project-${projectId}`);
+    }
+    if (!targetCard) return;
 
-      const icon = document.createElement('i');
-      icon.className = node.icon;
-      icon.style.color = node.color;
-      icon.setAttribute('aria-hidden', 'true');
-
-      btn.appendChild(icon);
-      bind3DTilt(btn);
-
-      btn.addEventListener('mouseenter', () => setActiveStackNode(node, btn));
-      btn.addEventListener('focus', () => setActiveStackNode(node, btn));
-      btn.addEventListener('click', () => setActiveStackNode(node, btn));
-      btn.addEventListener('keydown', (e) => {
-        if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
-          e.preventDefault();
-          const delta = e.key === 'ArrowRight' ? 1 : -1;
-          const nextIdx = (idx + delta + stackNodeEntries.length) % stackNodeEntries.length;
-          const nextEntry = stackNodeEntries[nextIdx];
-          setActiveStackNode(nextEntry.node, nextEntry.btn);
-          nextEntry.btn.focus();
-        }
-      });
-
-      stackNodeEntries.push({ node, btn });
-      stackRack.appendChild(btn);
+    targetCard.scrollIntoView({
+      behavior: reducedMotion ? 'auto' : 'smooth',
+      block: 'center',
     });
 
-    for (const groupEl of stackGroups) {
-      groupEl.addEventListener('click', () => {
-        const match = stackNodeEntries.find((entry) => entry.node.groupId === groupEl.dataset.group);
-        if (match) setActiveStackNode(match.node, match.btn);
-      });
+    for (const prev of document.querySelectorAll('.vault-card.is-jump-highlight')) {
+      prev.classList.remove('is-jump-highlight');
+    }
+    targetCard.classList.add('is-jump-highlight');
+    if (jumpHighlightTimer) clearTimeout(jumpHighlightTimer);
+    jumpHighlightTimer = setTimeout(() => {
+      targetCard.classList.remove('is-jump-highlight');
+    }, 1600);
+  };
+
+  const syncActiveLogos = () => {
+    if (!marqueeTrack) return;
+    for (const btn of marqueeTrack.querySelectorAll('.stack-logo-btn')) {
+      const isMatch = Boolean(activeTechId) && btn.dataset.techId === activeTechId;
+      btn.classList.toggle('is-active', isMatch);
+      btn.setAttribute('aria-pressed', String(isMatch));
+      btn.setAttribute('aria-expanded', String(isMatch));
+    }
+  };
+
+  const closeStackPanel = ({ restoreFocus = false } = {}) => {
+    if (!activeTechId && (!detailPanel || detailPanel.hidden)) return;
+    activeTechId = null;
+    if (detailPanel) detailPanel.hidden = true;
+    if (marqueeViewport) marqueeViewport.classList.remove('is-paused');
+    syncActiveLogos();
+    if (restoreFocus && lastStackTrigger && typeof lastStackTrigger.focus === 'function') {
+      lastStackTrigger.focus();
+    }
+    lastStackTrigger = null;
+  };
+
+  const openStackPanel = (node, triggerEl = null) => {
+    if (!detailPanel || !node) return;
+    if (activeTechId === node.id) {
+      closeStackPanel();
+      return;
     }
 
-    if (stackNodeEntries[2]) {
-      setActiveStackNode(stackNodeEntries[2].node, stackNodeEntries[2].btn);
+    activeTechId = node.id;
+    lastStackTrigger = triggerEl;
+    if (marqueeViewport) marqueeViewport.classList.add('is-paused');
+
+    if (detailIcon) renderTechGlyph(detailIcon, node);
+    if (detailName) detailName.textContent = node.name;
+    if (detailDesc) detailDesc.textContent = node.details || '';
+
+    if (detailProjectsRow && detailPills) {
+      detailPills.innerHTML = '';
+      const projects = Array.isArray(node.projects) ? node.projects : [];
+      if (projects.length > 0) {
+        for (const proj of projects) {
+          const pill = document.createElement('button');
+          pill.type = 'button';
+          pill.className = 'stack-project-pill';
+          pill.setAttribute('data-cursor', 'Jump');
+          pill.textContent = proj.title;
+          pill.addEventListener('click', () => scrollToProjectCard(proj.id));
+          detailPills.appendChild(pill);
+        }
+        detailProjectsRow.hidden = false;
+      } else {
+        detailProjectsRow.hidden = true;
+      }
+    }
+
+    detailPanel.hidden = false;
+    syncActiveLogos();
+  };
+
+  if (marqueeViewport && marqueeDrag && marqueeTrack && Array.isArray(TECH_STACK_NODES)) {
+    let suppressNextClick = false;
+    let dragX = 0;
+
+    const buildLogoSet = (isClone) => {
+      const setEl = document.createElement('div');
+      setEl.className = 'stack-marquee-set';
+      if (isClone) {
+        setEl.dataset.clone = 'true';
+        setEl.setAttribute('aria-hidden', 'true');
+      }
+
+      for (const node of TECH_STACK_NODES) {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'stack-logo-btn';
+        btn.dataset.techId = node.id;
+        btn.setAttribute('aria-label', node.name);
+        btn.setAttribute('aria-pressed', 'false');
+        btn.setAttribute('aria-expanded', 'false');
+        btn.setAttribute('aria-controls', 'stack-detail-panel');
+        btn.setAttribute('data-cursor', node.name);
+        if (isClone) btn.tabIndex = -1;
+
+        const glyph = document.createElement('span');
+        glyph.className = 'stack-logo-glyph';
+        glyph.setAttribute('aria-hidden', 'true');
+        renderTechGlyph(glyph, node);
+
+        const label = document.createElement('span');
+        label.className = 'stack-logo-label';
+        label.textContent = node.name;
+
+        btn.append(glyph, label);
+        btn.addEventListener('click', (e) => {
+          if (suppressNextClick) {
+            e.preventDefault();
+            suppressNextClick = false;
+            return;
+          }
+          openStackPanel(node, btn);
+        });
+
+        setEl.appendChild(btn);
+      }
+      return setEl;
+    };
+
+    // 3 sets: [clone-left][primary][clone-right] for seamless loop & bidirectional swipe
+    marqueeTrack.innerHTML = '';
+    marqueeTrack.append(buildLogoSet(true), buildLogoSet(false), buildLogoSet(true));
+
+    if (detailCloseBtn) {
+      detailCloseBtn.addEventListener('click', () => closeStackPanel({ restoreFocus: true }));
+    }
+
+    // Swipe / drag support on mobile and desktop (disabled under reduced motion where native scroll applies)
+    if (!reducedMotion) {
+      let pointerActive = false;
+      let dragging = false;
+      let startX = 0;
+      let startY = 0;
+      let startDragX = 0;
+      let activePointerId = null;
+
+      const wrapDragOffset = (val) => {
+        const setWidth = marqueeTrack.scrollWidth / 3;
+        if (!setWidth) return val;
+        const half = setWidth / 2;
+        let wrapped = val;
+        while (wrapped > half) wrapped -= setWidth;
+        while (wrapped < -half) wrapped += setWidth;
+        return wrapped;
+      };
+
+      marqueeViewport.addEventListener('pointerdown', (e) => {
+        if (e.button !== 0 && e.pointerType === 'mouse') return;
+        pointerActive = true;
+        dragging = false;
+        activePointerId = e.pointerId;
+        startX = e.clientX;
+        startY = e.clientY;
+        startDragX = dragX;
+      });
+
+      marqueeViewport.addEventListener('pointermove', (e) => {
+        if (!pointerActive || e.pointerId !== activePointerId) return;
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+
+        if (!dragging) {
+          if (Math.abs(dx) < 6) return;
+          if (Math.abs(dy) > Math.abs(dx)) {
+            pointerActive = false;
+            return;
+          }
+          dragging = true;
+          marqueeViewport.classList.add('is-dragging');
+          try {
+            marqueeViewport.setPointerCapture(e.pointerId);
+          } catch {
+            // ignore capture error
+          }
+        }
+
+        dragX = wrapDragOffset(startDragX + dx);
+        marqueeDrag.style.setProperty('--drag-x', `${dragX.toFixed(1)}px`);
+      });
+
+      const endDrag = (e) => {
+        if (!pointerActive || (activePointerId !== null && e.pointerId !== activePointerId)) return;
+        if (dragging) {
+          suppressNextClick = true;
+          setTimeout(() => {
+            suppressNextClick = false;
+          }, 80);
+          marqueeViewport.classList.remove('is-dragging');
+          try {
+            marqueeViewport.releasePointerCapture(e.pointerId);
+          } catch {
+            // ignore
+          }
+        }
+        pointerActive = false;
+        dragging = false;
+        activePointerId = null;
+      };
+
+      marqueeViewport.addEventListener('pointerup', endDrag);
+      marqueeViewport.addEventListener('pointercancel', endDrag);
     }
   }
 
   // =======================================================================
-  // 8. PROJECT VAULT FILTERING & PROJECT DETAIL MODAL WITH SCREENSHOTS
+  // 9. PROJECT VAULT FILTERING & CASE-STUDY DETAIL MODAL
   // =======================================================================
   const vaultGrid = document.getElementById('vault-grid');
   const filterButtons = Array.from(document.querySelectorAll('.filter-tab[data-filter]'));
@@ -586,18 +888,24 @@ document.addEventListener('DOMContentLoaded', () => {
   const modalTitle = document.getElementById('modal-project-title');
   const modalSubtitle = document.getElementById('modal-project-subtitle');
   const modalSummary = document.getElementById('modal-project-summary');
+  const modalCaseProblem = document.getElementById('modal-case-problem');
+  const modalCaseRole = document.getElementById('modal-case-role');
+  const modalCaseApproach = document.getElementById('modal-case-approach');
+  const modalCaseResult = document.getElementById('modal-case-result');
   const modalHighlights = document.getElementById('modal-project-highlights');
   const modalStack = document.getElementById('modal-project-stack');
   const modalLinks = document.getElementById('modal-project-links');
+  let lastFocusedTrigger = null;
 
-  const openProjectModal = (projectId) => {
+  const openProjectModal = (projectId, triggerEl = null) => {
     const project = getProjectById(PROJECTS, projectId);
     if (!project || !projectModal) return;
+    lastFocusedTrigger = triggerEl || document.activeElement;
 
     if (modalPreviewWrap && modalPreviewImg) {
       if (project.previewImg) {
-        modalPreviewImg.src = project.previewImg;
-        modalPreviewImg.alt = `${project.title} screenshot`;
+        modalPreviewImg.src = project.previewWebp || project.previewImg;
+        modalPreviewImg.alt = `${project.title} — ${project.subtitle} screenshot`;
         modalPreviewWrap.hidden = false;
         wireMediaFrame(modalPreviewWrap);
       } else {
@@ -608,8 +916,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     modalMeta.textContent = `${project.categoryLabel} · ${project.year} · ${project.status}`;
     modalTitle.textContent = project.title;
-    modalSubtitle.textContent = `${project.subtitle} — ${project.role}`;
+    modalSubtitle.textContent = project.subtitle;
     modalSummary.textContent = project.summary;
+
+    const cs = project.caseStudy || {};
+    if (modalCaseProblem) modalCaseProblem.textContent = cs.problem || project.summary;
+    if (modalCaseRole) modalCaseRole.textContent = cs.role || project.role || '[ADD ROLE]';
+    if (modalCaseApproach) modalCaseApproach.textContent = cs.approach || project.highlights[0] || '';
+    if (modalCaseResult) modalCaseResult.textContent = cs.result || '[ADD METRIC]';
 
     modalHighlights.innerHTML = '';
     for (const bullet of project.highlights) {
@@ -645,7 +959,12 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   const closeProjectModal = () => {
-    if (projectModal) projectModal.hidden = true;
+    if (projectModal && !projectModal.hidden) {
+      projectModal.hidden = true;
+      if (lastFocusedTrigger && typeof lastFocusedTrigger.focus === 'function') {
+        lastFocusedTrigger.focus();
+      }
+    }
   };
 
   if (closeProjectModalBtn) closeProjectModalBtn.addEventListener('click', closeProjectModal);
@@ -665,64 +984,50 @@ document.addEventListener('DOMContentLoaded', () => {
 
     vaultGrid.innerHTML = '';
 
-    for (const item of ordered) {
+    ordered.forEach((item, idx) => {
       const card = document.createElement('article');
+      card.id = `project-${item.id}`;
+      card.dataset.projectCardId = item.id;
       const isHighlighted = Boolean(item.featured);
       const isOddSpan =
         !isHighlighted &&
         hasOddTrailingRegular &&
         item === regularItems[regularItems.length - 1];
-      card.className = `vault-card${isHighlighted ? ' vault-card-featured card-3d' : ''}${isOddSpan ? ' vault-card-span' : ''} reveal-block`;
+      card.className = `vault-card${isHighlighted ? ' vault-card-featured card-3d' : ''}${isOddSpan ? ' vault-card-span' : ''} reveal-block is-revealed`;
       if (isHighlighted) {
         card.setAttribute('data-tilt', '');
         bind3DTilt(card);
       }
 
       if (item.previewImg) {
-        const previewBox = document.createElement('div');
-        previewBox.className = `vault-preview-box media-frame${item.previewFit === 'contain' ? ' is-contain' : ''}`;
-        previewBox.setAttribute('role', 'button');
-        previewBox.setAttribute('tabindex', '0');
-        previewBox.setAttribute('data-cursor', 'Specs');
-        previewBox.setAttribute('aria-label', `Inspect ${item.title}`);
+        const previewBox = document.createElement('button');
+        previewBox.type = 'button';
+        previewBox.className = 'vault-preview-box media-frame';
+        previewBox.setAttribute('data-cursor', 'Case Study');
+        previewBox.setAttribute('aria-label', `Inspect ${item.title} case study`);
+
+        const picture = document.createElement('picture');
+        if (item.previewWebp) {
+          const source = document.createElement('source');
+          source.srcset = item.previewWebp;
+          source.type = 'image/webp';
+          picture.appendChild(source);
+        }
 
         const img = document.createElement('img');
         img.src = item.previewImg;
-        img.alt = `${item.title} preview screenshot`;
+        img.alt = item.previewAlt || `${item.title} — ${item.subtitle} interface preview`;
+        img.width = item.previewWidth || 1280;
+        img.height = item.previewHeight || 720;
+        img.decoding = 'async';
         img.referrerPolicy = 'no-referrer';
-        previewBox.appendChild(img);
 
-        previewBox.addEventListener('click', () => openProjectModal(item.id));
-        previewBox.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            openProjectModal(item.id);
-          }
-        });
+        picture.appendChild(img);
+        previewBox.appendChild(picture);
+
+        previewBox.addEventListener('click', () => openProjectModal(item.id, previewBox));
         card.appendChild(previewBox);
         wireMediaFrame(previewBox);
-      } else {
-        const fallback = document.createElement('div');
-        fallback.className = 'vault-fallback-box';
-        fallback.setAttribute('role', 'button');
-        fallback.setAttribute('tabindex', '0');
-        fallback.setAttribute('data-cursor', 'Specs');
-        fallback.innerHTML =
-          '<div class="vault-fallback-top"><span>Streamlit Cloud · ITE 398</span><span class="tabular-nums">2025</span></div>' +
-          '<div class="vault-fallback-mid">' +
-          '  <div><strong class="tabular-nums">~100</strong><span>Dishes indexed</span></div>' +
-          '  <div><strong class="tabular-nums">100</strong><span>Real testers</span></div>' +
-          '  <div><strong class="tabular-nums">SQLite</strong><span>Data store</span></div>' +
-          '</div>' +
-          '<div class="vault-fallback-foot">Pandas ingestion &amp; ingredient-to-dish recommendation engine →</div>';
-        fallback.addEventListener('click', () => openProjectModal(item.id));
-        fallback.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            openProjectModal(item.id);
-          }
-        });
-        card.appendChild(fallback);
       }
 
       const bodyWrap = document.createElement('div');
@@ -750,9 +1055,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const detailBtn = document.createElement('button');
       detailBtn.type = 'button';
       detailBtn.className = 'vault-open-btn';
-      detailBtn.setAttribute('data-cursor', 'Specs');
+      detailBtn.setAttribute('data-cursor', 'Case Study');
       detailBtn.textContent = 'Inspect details →';
-      detailBtn.addEventListener('click', () => openProjectModal(item.id));
+      detailBtn.addEventListener('click', () => openProjectModal(item.id, detailBtn));
       actions.appendChild(detailBtn);
 
       const extHref = item.liveUrl || item.repoUrl;
@@ -770,40 +1075,60 @@ document.addEventListener('DOMContentLoaded', () => {
       bodyWrap.append(meta, title, summary, stack, actions);
       card.appendChild(bodyWrap);
       vaultGrid.appendChild(card);
-
-      if (revealObserver) {
-        revealObserver.observe(card);
-      } else {
-        card.classList.add('is-revealed');
-      }
-    }
+    });
   };
 
-  for (const btn of filterButtons) {
-    btn.addEventListener('click', () => {
+  if (filterButtons.length > 0 && vaultGrid) {
+    const activateFilterTab = (btn, shouldFocus = false) => {
       const cat = btn.getAttribute('data-filter') || 'all';
       for (const b of filterButtons) {
         const active = b === btn;
         b.classList.toggle('active', active);
         b.setAttribute('aria-selected', String(active));
+        b.setAttribute('tabindex', active ? '0' : '-1');
       }
+      vaultGrid.setAttribute('aria-labelledby', btn.id || '');
       renderVault(cat);
+      if (shouldFocus) btn.focus();
+    };
+
+    ensureAllProjectsVisible = () => {
+      const allBtn = filterButtons.find((b) => b.getAttribute('data-filter') === 'all');
+      if (allBtn) activateFilterTab(allBtn, false);
+    };
+
+    filterButtons.forEach((btn, idx) => {
+      btn.setAttribute('tabindex', btn.classList.contains('active') ? '0' : '-1');
+      btn.addEventListener('click', () => activateFilterTab(btn, false));
+      btn.addEventListener('keydown', (e) => {
+        let targetIdx = null;
+        if (e.key === 'ArrowRight') targetIdx = (idx + 1) % filterButtons.length;
+        else if (e.key === 'ArrowLeft') targetIdx = (idx - 1 + filterButtons.length) % filterButtons.length;
+        else if (e.key === 'Home') targetIdx = 0;
+        else if (e.key === 'End') targetIdx = filterButtons.length - 1;
+        if (targetIdx !== null) {
+          e.preventDefault();
+          activateFilterTab(filterButtons[targetIdx], true);
+        }
+      });
     });
+
+    renderVault('all');
   }
 
   for (const trigger of document.querySelectorAll('[data-project-id]')) {
     trigger.addEventListener('click', () => {
       const id = trigger.getAttribute('data-project-id');
-      if (id) openProjectModal(id);
+      if (id) openProjectModal(id, trigger);
     });
   }
 
-  renderVault('all');
-
   // =======================================================================
-  // 9. EMBEDDED VIDEO REELS & YOUTUBE THEATER MODAL
+  // 10. EMBEDDED VIDEO REELS & YOUTUBE FACADE THEATER MODAL
   // =======================================================================
-  const mediaGrid = document.getElementById('media-grid');
+  const reelsStrip = document.getElementById('reels-strip');
+  const reelsPrevBtn = document.getElementById('reels-prev');
+  const reelsNextBtn = document.getElementById('reels-next');
   const videoModal = document.getElementById('video-modal');
   const closeVideoModalBtn = document.getElementById('close-video-modal');
   const videoModalPlatform = document.getElementById('video-modal-platform');
@@ -816,10 +1141,15 @@ document.addEventListener('DOMContentLoaded', () => {
       videoPlayerStage.innerHTML = '';
       videoPlayerStage.classList.remove('is-vertical');
     }
+    if (lastFocusedTrigger && typeof lastFocusedTrigger.focus === 'function') {
+      lastFocusedTrigger.focus();
+      lastFocusedTrigger = null;
+    }
   };
 
-  const openVideoModal = (item) => {
+  const openVideoModal = (item, triggerEl = null) => {
     if (!videoModal || !videoPlayerStage || !item) return;
+    lastFocusedTrigger = triggerEl || document.activeElement;
     if (videoModalPlatform) videoModalPlatform.textContent = item.platform;
     if (videoModalTitle) videoModalTitle.textContent = item.title;
 
@@ -844,6 +1174,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const iframe = document.createElement('iframe');
       iframe.src = item.embedUrl;
       iframe.title = item.title;
+      iframe.loading = 'lazy';
       iframe.allow =
         'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
       iframe.allowFullscreen = true;
@@ -856,58 +1187,75 @@ document.addEventListener('DOMContentLoaded', () => {
     closeVideoModalBtn?.focus();
   };
 
-  if (mediaGrid) {
+  if (reelsStrip) {
     for (const item of MEDIA_SHOWCASE) {
       const btn = document.createElement('button');
       btn.type = 'button';
-      btn.className = 'media-card card-3d reveal-block';
-      btn.setAttribute('data-tilt', '');
+      btn.className = 'reel-item';
       btn.setAttribute('data-cursor', 'Play');
       btn.setAttribute('data-media-id', item.id);
       btn.setAttribute('aria-label', `Play ${item.title}`);
-      bind3DTilt(btn);
 
-      const thumbBox = document.createElement('div');
-      thumbBox.className = 'media-thumb-box media-frame';
+      const thumb = document.createElement('div');
+      thumb.className = 'reel-thumb media-frame';
 
       const img = document.createElement('img');
       img.src = item.poster;
-      img.alt = `${item.title} preview`;
+      img.alt = `${item.title} video edit thumbnail`;
+      img.width = item.width || 720;
+      img.height = item.height || 900;
+      img.loading = 'lazy';
+      img.decoding = 'async';
       img.referrerPolicy = 'no-referrer';
 
       const scrim = document.createElement('div');
-      scrim.className = 'media-thumb-scrim';
+      scrim.className = 'reel-scrim';
 
       const playBadge = document.createElement('span');
-      playBadge.className = 'media-play-badge';
+      playBadge.className = 'reel-play-badge';
       playBadge.innerHTML = '<i class="fa-solid fa-play" aria-hidden="true"></i>';
 
       scrim.appendChild(playBadge);
-      thumbBox.append(img, scrim);
-      wireMediaFrame(thumbBox);
+      thumb.append(img, scrim);
+      wireMediaFrame(thumb);
 
-      const info = document.createElement('div');
-      info.className = 'media-card-info';
-
-      const platformEl = document.createElement('span');
-      platformEl.className = 'media-card-platform';
-      platformEl.textContent = item.platform;
+      const meta = document.createElement('div');
+      meta.className = 'reel-meta';
 
       const titleEl = document.createElement('span');
-      titleEl.className = 'media-card-title';
+      titleEl.className = 'reel-title';
       titleEl.textContent = item.title;
 
-      info.append(platformEl, titleEl);
-      btn.append(thumbBox, info);
-      btn.addEventListener('click', () => openVideoModal(item));
-      mediaGrid.appendChild(btn);
+      const platformEl = document.createElement('span');
+      platformEl.className = 'reel-platform';
+      platformEl.textContent = item.platform;
 
-      if (revealObserver) {
-        revealObserver.observe(btn);
-      } else {
-        btn.classList.add('is-revealed');
-      }
+      meta.append(titleEl, platformEl);
+      btn.append(thumb, meta);
+      btn.addEventListener('click', () => openVideoModal(item, btn));
+      reelsStrip.appendChild(btn);
     }
+
+    const syncReelsArrows = () => {
+      const maxScroll = Math.max(0, reelsStrip.scrollWidth - reelsStrip.clientWidth);
+      if (reelsPrevBtn) reelsPrevBtn.disabled = reelsStrip.scrollLeft <= 2;
+      if (reelsNextBtn) reelsNextBtn.disabled = reelsStrip.scrollLeft >= maxScroll - 2;
+    };
+
+    const scrollReelsBy = (dir) => {
+      const firstItem = reelsStrip.querySelector('.reel-item');
+      const step = firstItem ? firstItem.getBoundingClientRect().width + 22 : 322;
+      reelsStrip.scrollBy({
+        left: dir * step,
+        behavior: reducedMotion ? 'auto' : 'smooth',
+      });
+    };
+
+    if (reelsPrevBtn) reelsPrevBtn.addEventListener('click', () => scrollReelsBy(-1));
+    if (reelsNextBtn) reelsNextBtn.addEventListener('click', () => scrollReelsBy(1));
+    reelsStrip.addEventListener('scroll', syncReelsArrows, { passive: true });
+    window.addEventListener('resize', syncReelsArrows);
+    requestAnimationFrame(syncReelsArrows);
   }
 
   if (closeVideoModalBtn) closeVideoModalBtn.addEventListener('click', closeVideoModal);
@@ -918,7 +1266,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // =======================================================================
-  // 10. CERTIFICATE LIGHTBOX MODAL WITH CLICK-TO-VIEW CREDENTIAL DETAILS
+  // 11. CERTIFICATE LIGHTBOX MODAL (SHARED BY INDEX.HTML & ABOUT.HTML)
   // =======================================================================
   const certModal = document.getElementById('cert-modal');
   const certModalImg = document.getElementById('cert-modal-img');
@@ -930,49 +1278,66 @@ document.addEventListener('DOMContentLoaded', () => {
   const closeCertModalBtn = document.getElementById('close-cert-modal');
 
   const closeCertModal = () => {
-    if (certModal) certModal.hidden = true;
-    if (certModalImg) certModalImg.removeAttribute('src');
-    if (certModalActions) {
-      certModalActions.innerHTML = '';
-      certModalActions.hidden = true;
+    if (certModal && !certModal.hidden) {
+      certModal.hidden = true;
+      if (certModalImg) certModalImg.removeAttribute('src');
+      if (certModalActions) {
+        certModalActions.innerHTML = '';
+        certModalActions.hidden = true;
+      }
+      if (lastFocusedTrigger && typeof lastFocusedTrigger.focus === 'function') {
+        lastFocusedTrigger.focus();
+        lastFocusedTrigger = null;
+      }
     }
   };
 
-  for (const thumb of document.querySelectorAll('[data-cert-src]')) {
+  for (const thumb of document.querySelectorAll('[data-cert-title]')) {
     thumb.addEventListener('click', () => {
-      const src = thumb.getAttribute('data-cert-src');
+      const src = thumb.getAttribute('data-cert-src') || '';
       const title = thumb.getAttribute('data-cert-title') || 'Certificate';
       const meta = thumb.getAttribute('data-cert-meta') || '';
       const desc = thumb.getAttribute('data-cert-desc') || '';
       const verifyUrl = thumb.getAttribute('data-cert-verify');
+      const verifyLabel = thumb.getAttribute('data-cert-verify-label') || 'Verify Credential ↗';
 
-      if (certModal && certModalImg && certModalTitle && src) {
-        certModalImg.src = src;
-        certModalImg.alt = title;
-        wireMediaFrame(certModalFrame);
-        if (certModalMeta) certModalMeta.textContent = meta;
-        certModalTitle.textContent = title;
-        if (certModalDesc) certModalDesc.textContent = desc;
+      if (!certModal || !certModalTitle) return;
+      lastFocusedTrigger = thumb;
 
-        if (certModalActions) {
-          certModalActions.innerHTML = '';
-          if (verifyUrl) {
-            const verifyA = document.createElement('a');
-            verifyA.href = verifyUrl;
-            verifyA.target = '_blank';
-            verifyA.rel = 'noopener noreferrer';
-            verifyA.className = 'btn-3d btn-3d-primary btn-sm-pill';
-            verifyA.textContent = 'Verify CCP Credential ↗';
-            certModalActions.appendChild(verifyA);
-            certModalActions.hidden = false;
-          } else {
-            certModalActions.hidden = true;
-          }
+      if (certModalFrame && certModalImg) {
+        if (src) {
+          certModalImg.src = src;
+          certModalImg.alt = `${title} credential image`;
+          certModalFrame.hidden = false;
+          wireMediaFrame(certModalFrame);
+        } else {
+          certModalImg.removeAttribute('src');
+          certModalFrame.hidden = true;
         }
-
-        certModal.hidden = false;
-        closeCertModalBtn?.focus();
       }
+
+      if (certModalMeta) certModalMeta.textContent = meta;
+      certModalTitle.textContent = title;
+      if (certModalDesc) certModalDesc.textContent = desc;
+
+      if (certModalActions) {
+        certModalActions.innerHTML = '';
+        if (verifyUrl) {
+          const verifyA = document.createElement('a');
+          verifyA.href = verifyUrl;
+          verifyA.target = '_blank';
+          verifyA.rel = 'noopener noreferrer';
+          verifyA.className = 'btn-3d btn-3d-primary btn-sm-pill';
+          verifyA.textContent = verifyLabel;
+          certModalActions.appendChild(verifyA);
+          certModalActions.hidden = false;
+        } else {
+          certModalActions.hidden = true;
+        }
+      }
+
+      certModal.hidden = false;
+      closeCertModalBtn?.focus();
     });
   }
 
@@ -984,7 +1349,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // =======================================================================
-  // 11. CONTACT COMPOSER WITH CLIPBOARD FALLBACK
+  // 12. CONTACT COMPOSER: PRESELECTION, VALIDATION, WORKER FETCH & FALLBACK
   // =======================================================================
   const copyTextSafely = async (text) => {
     if (navigator.clipboard && window.isSecureContext) {
@@ -992,7 +1357,7 @@ document.addEventListener('DOMContentLoaded', () => {
         await navigator.clipboard.writeText(text);
         return true;
       } catch {
-        // fall through to textarea copy
+        // fall through
       }
     }
     const ta = document.createElement('textarea');
@@ -1013,30 +1378,317 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   const contactForm = document.getElementById('contact-form');
+  const contactFormFields = document.getElementById('contact-form-fields');
+  const contactSuccessPanel = document.getElementById('contact-success-panel');
+  const contactSuccessHeading = document.getElementById('contact-success-heading');
+  const contactSendAnotherBtn = document.getElementById('contact-send-another');
+  const topicRadios = Array.from(document.querySelectorAll('#contact-topic-group input[name="topic"]'));
+  const contactNameInput = document.getElementById('contact-name');
+  const contactEmailInput = document.getElementById('contact-email');
+  const contactCompanyInput = document.getElementById('contact-company');
+  const contactMessageInput = document.getElementById('contact-message');
+  const contactWebsiteInput = document.getElementById('contact-website');
+  const contactMessageCounter = document.getElementById('contact-message-counter');
   const contactStatus = document.getElementById('contact-status');
   const copyInquiryBtn = document.getElementById('copy-inquiry-btn');
+  const submitInquiryBtn = document.getElementById('contact-submit-btn');
+  const submitLabelEl = submitInquiryBtn?.querySelector('.form-submit-label');
+
+  const fieldMap = {
+    name: {
+      input: contactNameInput,
+      errorEl: document.getElementById('contact-name-error'),
+    },
+    email: {
+      input: contactEmailInput,
+      errorEl: document.getElementById('contact-email-error'),
+    },
+    message: {
+      input: contactMessageInput,
+      errorEl: document.getElementById('contact-message-error'),
+    },
+  };
+
+  let isSubmittingContact = false;
+  let cooldownUntil = 0;
+  let cooldownTimerId = null;
+
+  // Inline contact copy buttons (email & phone) with 1.5s "Copied" feedback
+  for (const copyBtn of document.querySelectorAll('.contact-copy-chip[data-copy-value]')) {
+    let resetTimer = null;
+    copyBtn.addEventListener('click', async () => {
+      const value = copyBtn.getAttribute('data-copy-value') || '';
+      if (!value) return;
+      const ok = await copyTextSafely(value);
+      const labelSpan = copyBtn.querySelector('span');
+      const iconEl = copyBtn.querySelector('i');
+      if (!ok) return;
+      if (resetTimer) clearTimeout(resetTimer);
+      copyBtn.classList.add('is-copied');
+      if (labelSpan) labelSpan.textContent = 'Copied';
+      if (iconEl) iconEl.className = 'fa-solid fa-check';
+      resetTimer = setTimeout(() => {
+        copyBtn.classList.remove('is-copied');
+        if (labelSpan) labelSpan.textContent = 'Copy';
+        if (iconEl) iconEl.className = 'fa-regular fa-copy';
+      }, 1500);
+    });
+  }
+
+  const getSelectedInquiryType = () => {
+    const checked = topicRadios.find((r) => r.checked);
+    return checked?.value || 'Dec 2026 OJT / Internship';
+  };
+
+  const syncMessagePlaceholder = () => {
+    if (!contactMessageInput) return;
+    contactMessageInput.placeholder = getInquiryPlaceholder(getSelectedInquiryType());
+  };
+
+  const syncMessageCounter = () => {
+    if (!contactMessageInput || !contactMessageCounter) return;
+    const len = contactMessageInput.value.length;
+    contactMessageCounter.textContent = `${len} / ${MAX_CONTACT_MESSAGE_LENGTH}`;
+    contactMessageCounter.classList.toggle('is-near-limit', len >= 900 && len < MAX_CONTACT_MESSAGE_LENGTH);
+    contactMessageCounter.classList.toggle('is-at-limit', len >= MAX_CONTACT_MESSAGE_LENGTH);
+  };
+
+  const preselectInquiry = (value) => {
+    if (topicRadios.length === 0 || !value) return;
+    const options = topicRadios.map((r) => r.value);
+    const needle = value.trim().toLowerCase();
+    const match =
+      options.find((v) => v.toLowerCase() === needle) ||
+      options.find((v) => v.toLowerCase().includes(needle));
+    if (match) {
+      for (const radio of topicRadios) {
+        radio.checked = radio.value === match;
+      }
+      syncMessagePlaceholder();
+    }
+  };
+
+  if (topicRadios.length > 0) {
+    const options = topicRadios.map((r) => r.value);
+    const resolved = resolveInquiryFromSearch(window.location.search, options);
+    if (resolved) preselectInquiry(resolved);
+    syncMessagePlaceholder();
+
+    topicRadios.forEach((radio, idx) => {
+      radio.addEventListener('change', syncMessagePlaceholder);
+      radio.addEventListener('keydown', (e) => {
+        let nextIdx = null;
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+          nextIdx = (idx + 1) % topicRadios.length;
+        } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+          nextIdx = (idx - 1 + topicRadios.length) % topicRadios.length;
+        }
+        if (nextIdx !== null) {
+          e.preventDefault();
+          topicRadios[nextIdx].checked = true;
+          topicRadios[nextIdx].focus();
+          syncMessagePlaceholder();
+        }
+      });
+    });
+  }
+
+  for (const ctaTrigger of document.querySelectorAll('[data-inquiry]')) {
+    ctaTrigger.addEventListener('click', () => {
+      const val = ctaTrigger.getAttribute('data-inquiry');
+      if (val) preselectInquiry(val);
+    });
+  }
+
+  const setFieldError = (fieldKey, message) => {
+    const entry = fieldMap[fieldKey];
+    if (!entry || !entry.input) return;
+    const hasError = Boolean(message);
+    entry.input.setAttribute('aria-invalid', hasError ? 'true' : 'false');
+    if (entry.errorEl) entry.errorEl.textContent = message || '';
+  };
+
+  const clearAllFieldErrors = () => {
+    setFieldError('name', '');
+    setFieldError('email', '');
+    setFieldError('message', '');
+  };
+
+  for (const [key, entry] of Object.entries(fieldMap)) {
+    if (!entry.input) continue;
+    entry.input.addEventListener('blur', () => {
+      const err = validateContactField(key, entry.input.value);
+      setFieldError(key, err);
+    });
+    entry.input.addEventListener('input', () => {
+      if (key === 'message') syncMessageCounter();
+      if (entry.input.getAttribute('aria-invalid') === 'true') {
+        const err = validateContactField(key, entry.input.value);
+        setFieldError(key, err);
+      }
+    });
+  }
+
+  syncMessageCounter();
 
   const readContactFields = () => ({
-    topic: document.getElementById('contact-topic')?.value || 'Dec 2026 OJT / Internship',
-    name: document.getElementById('contact-name')?.value.trim() || '',
-    email: document.getElementById('contact-email')?.value.trim() || '',
-    message: document.getElementById('contact-message')?.value.trim() || '',
+    type: getSelectedInquiryType(),
+    topic: getSelectedInquiryType(),
+    name: contactNameInput?.value || '',
+    email: contactEmailInput?.value || '',
+    company: contactCompanyInput?.value || '',
+    message: contactMessageInput?.value || '',
+    website: contactWebsiteInput?.value || '',
   });
 
+  const setContactStatus = (msg, state = '') => {
+    if (!contactStatus) return;
+    contactStatus.textContent = msg;
+    contactStatus.classList.remove('is-error', 'is-success');
+    if (state === 'error') contactStatus.classList.add('is-error');
+    if (state === 'success') contactStatus.classList.add('is-success');
+  };
+
+  const triggerMailtoLink = (mailtoUrl) => {
+    const link = document.createElement('a');
+    link.href = mailtoUrl;
+    link.style.display = 'none';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const syncCooldownButton = () => {
+    if (!submitInquiryBtn || !submitLabelEl) return;
+    if (isSubmittingContact) return;
+    const remainingMs = cooldownUntil - Date.now();
+    if (remainingMs > 0) {
+      const secs = Math.ceil(remainingMs / 1000);
+      submitInquiryBtn.disabled = true;
+      submitLabelEl.textContent = `Wait ${secs}s`;
+    } else {
+      submitInquiryBtn.disabled = false;
+      submitLabelEl.textContent = 'Send Message';
+      if (cooldownTimerId !== null) {
+        clearInterval(cooldownTimerId);
+        cooldownTimerId = null;
+      }
+    }
+  };
+
+  const startContactCooldown = () => {
+    cooldownUntil = Date.now() + CONTACT_COOLDOWN_MS;
+    if (cooldownTimerId !== null) clearInterval(cooldownTimerId);
+    cooldownTimerId = setInterval(syncCooldownButton, 500);
+    syncCooldownButton();
+  };
+
+  const showContactSuccess = () => {
+    clearAllFieldErrors();
+    setContactStatus('');
+    if (contactFormFields) contactFormFields.hidden = true;
+    if (contactSuccessPanel) {
+      contactSuccessPanel.hidden = false;
+      contactSuccessHeading?.focus();
+    }
+  };
+
+  const restoreContactForm = () => {
+    if (contactForm) contactForm.reset();
+    clearAllFieldErrors();
+    syncMessagePlaceholder();
+    syncMessageCounter();
+    setContactStatus('');
+    if (contactSuccessPanel) contactSuccessPanel.hidden = true;
+    if (contactFormFields) contactFormFields.hidden = false;
+    syncCooldownButton();
+    contactNameInput?.focus();
+  };
+
+  if (contactSendAnotherBtn) {
+    contactSendAnotherBtn.addEventListener('click', restoreContactForm);
+  }
+
   if (contactForm) {
-    contactForm.addEventListener('submit', (e) => {
+    contactForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const fields = readContactFields();
-      if (!fields.name || !fields.email || !fields.message) {
-        if (contactStatus) contactStatus.textContent = 'Please complete your name, email, and message first.';
+      if (isSubmittingContact) return;
+
+      const remainingMs = cooldownUntil - Date.now();
+      if (remainingMs > 0) {
+        const secs = Math.ceil(remainingMs / 1000);
+        setContactStatus(`Please wait ${secs}s before sending another message.`, 'error');
         return;
       }
 
-      const { mailtoUrl } = buildInquiryPayload(fields);
-      window.location.href = mailtoUrl;
+      const raw = readContactFields();
+      const validation = validateInquiryFields(raw);
 
-      if (contactStatus) {
-        contactStatus.textContent = 'Opening your mail app addressed to mereziko@gmail.com (or click Copy Note).';
+      if (validation.isSpam) {
+        contactForm.reset();
+        syncMessagePlaceholder();
+        syncMessageCounter();
+        showContactSuccess();
+        return;
+      }
+
+      setFieldError('name', validation.errors.name);
+      setFieldError('email', validation.errors.email);
+      setFieldError('message', validation.errors.message);
+
+      if (!validation.ok) {
+        setContactStatus(validation.error, 'error');
+        const firstEl = validation.firstInvalidField ? fieldMap[validation.firstInvalidField]?.input : null;
+        firstEl?.focus();
+        return;
+      }
+
+      isSubmittingContact = true;
+      if (submitInquiryBtn) {
+        submitInquiryBtn.disabled = true;
+        submitInquiryBtn.classList.add('is-sending');
+        submitInquiryBtn.setAttribute('aria-busy', 'true');
+      }
+      if (submitLabelEl) submitLabelEl.textContent = 'Sending...';
+      setContactStatus('Sending your message...');
+
+      try {
+        const result = await submitInquiryRequest(
+          { ...validation.cleaned, website: raw.website },
+          { endpoint: FORM_ENDPOINT, timeoutMs: CONTACT_TIMEOUT_MS }
+        );
+
+        if (result.status === 'honeypot' || result.status === 'sent') {
+          startContactCooldown();
+          showContactSuccess();
+          return;
+        }
+
+        // Unconfigured placeholder, timeout, or network error -> mailto fallback & keep user text
+        triggerMailtoLink(result.mailtoUrl);
+        if (result.reason === 'unconfigured') {
+          setContactStatus(
+            'Direct form delivery is not connected yet — opened a prefilled email to mereziko@gmail.com instead (or click Copy Note).',
+            'success'
+          );
+        } else if (result.reason === 'timeout') {
+          setContactStatus(
+            'Request timed out after 10 seconds — opened a prefilled email to mereziko@gmail.com instead. Your message is still here if you want to copy it.',
+            'error'
+          );
+        } else {
+          setContactStatus(
+            'Could not reach the form server — opened a prefilled email to mereziko@gmail.com instead. Your message is still here if you want to copy it.',
+            'error'
+          );
+        }
+      } finally {
+        isSubmittingContact = false;
+        if (submitInquiryBtn) {
+          submitInquiryBtn.classList.remove('is-sending');
+          submitInquiryBtn.removeAttribute('aria-busy');
+        }
+        syncCooldownButton();
       }
     });
   }
@@ -1044,27 +1696,27 @@ document.addEventListener('DOMContentLoaded', () => {
   if (copyInquiryBtn) {
     copyInquiryBtn.addEventListener('click', async () => {
       const fields = readContactFields();
-      if (!fields.name || !fields.message) {
-        if (contactStatus) contactStatus.textContent = 'Enter your name and message first to copy the note.';
+      if (!fields.name.trim() || !fields.message.trim()) {
+        setContactStatus('Enter your name and message first to copy the note.', 'error');
         return;
       }
       const { subject, bodyText } = buildInquiryPayload(fields);
       const ok = await copyTextSafely(`To: mereziko@gmail.com\nSubject: ${subject}\n\n${bodyText}`);
       if (ok) {
         copyInquiryBtn.classList.add('is-feedback-pop');
-        if (contactStatus) contactStatus.textContent = 'Formatted inquiry copied to clipboard for easy pasting.';
+        setContactStatus('Formatted inquiry copied to clipboard for easy pasting.', 'success');
         setTimeout(() => copyInquiryBtn.classList.remove('is-feedback-pop'), 1800);
-      } else if (contactStatus) {
-        contactStatus.textContent = 'Please email mereziko@gmail.com directly.';
+      } else {
+        setContactStatus('Please email mereziko@gmail.com directly.', 'error');
       }
     });
   }
 
   // =======================================================================
-  // 12. 2048 MINI-GAME MODAL (NO WINDOW.ALERT)
+  // 13. 2048 MINI-GAME MODAL (QUIET ACCESS VIA FOOTER / SIDEBAR)
   // =======================================================================
   const gameModal = document.getElementById('game-modal');
-  const openGameBtn = document.getElementById('open-game-btn');
+  const openGameBtns = Array.from(document.querySelectorAll('#open-game-btn, .open-game-trigger'));
   const closeGameBtn = document.getElementById('close-game');
   const resetGameBtn = document.getElementById('reset-game');
   const gridEl = document.getElementById('game-grid');
@@ -1125,12 +1777,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  if (openGameBtn && gameModal) {
-    openGameBtn.addEventListener('click', () => {
-      gameModal.hidden = false;
-      initGame();
-      setSidebarOpen(false);
-    });
+  if (gameModal) {
+    for (const triggerBtn of openGameBtns) {
+      triggerBtn.addEventListener('click', () => {
+        gameModal.hidden = false;
+        initGame();
+        setSidebarOpen(false);
+        closeGameBtn?.focus();
+      });
+    }
   }
   if (closeGameBtn && gameModal) {
     closeGameBtn.addEventListener('click', () => {
@@ -1152,8 +1807,32 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   document.addEventListener('keydown', (e) => {
+    if (e.key === 'Tab') {
+      if (gameModal && !gameModal.hidden) {
+        trapTabFocus(gameModal, e);
+        return;
+      }
+      if (certModal && !certModal.hidden) {
+        trapTabFocus(certModal, e);
+        return;
+      }
+      if (videoModal && !videoModal.hidden) {
+        trapTabFocus(videoModal, e);
+        return;
+      }
+      if (projectModal && !projectModal.hidden) {
+        trapTabFocus(projectModal, e);
+        return;
+      }
+      if (body.classList.contains('sidebar-open') && sidebarEl) {
+        trapTabFocus(sidebarEl, e);
+        return;
+      }
+    }
+
     if (e.key === 'Escape') {
-      if (body.classList.contains('sidebar-open')) setSidebarOpen(false);
+      if (body.classList.contains('sidebar-open')) setSidebarOpen(false, { restoreFocus: true });
+      closeStackPanel({ restoreFocus: true });
       closeProjectModal();
       closeVideoModal();
       closeCertModal();
@@ -1176,4 +1855,6 @@ document.addEventListener('DOMContentLoaded', () => {
       handleMove('right');
     }
   });
+
+  initMascot();
 });

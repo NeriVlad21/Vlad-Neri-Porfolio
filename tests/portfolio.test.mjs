@@ -10,6 +10,9 @@ import {
   filterProjects,
   getProjectById,
   computeActiveSectionId,
+  isConfiguredWorkerEndpoint,
+  validateInquiryFields,
+  resolveInquiryFromSearch,
   buildInquiryPayload,
   slideAndMergeRow,
   moveBoardMatrix,
@@ -152,4 +155,55 @@ test('2048 moveBoardMatrix and isBoardGameOver work across directions', () => {
     [4, 2, 4, 2],
   ];
   assert.equal(isBoardGameOver(stuckBoard), true);
+});
+
+test('all 11 projects include structured caseStudy fields and WebP preview metadata', () => {
+  for (const p of PROJECTS) {
+    assert.ok(p.previewWebp && p.previewWebp.endsWith('.webp'), `${p.id} should define previewWebp`);
+    assert.ok(p.previewWidth > 0 && p.previewHeight > 0, `${p.id} should define preview dimensions`);
+    assert.ok(p.caseStudy?.problem, `${p.id} caseStudy.problem required`);
+    assert.ok(p.caseStudy?.role, `${p.id} caseStudy.role required`);
+    assert.ok(p.caseStudy?.approach, `${p.id} caseStudy.approach required`);
+    assert.ok(p.caseStudy?.result, `${p.id} caseStudy.result required`);
+  }
+});
+
+test('validateInquiryFields enforces validation and catches honeypot spam', () => {
+  const shortName = validateInquiryFields({ name: 'A', email: 'a@b.com', message: 'Hello world from team' });
+  assert.equal(shortName.ok, false);
+
+  const badEmail = validateInquiryFields({ name: 'Alex', email: 'not-an-email', message: 'Hello world from team' });
+  assert.equal(badEmail.ok, false);
+
+  const shortMsg = validateInquiryFields({ name: 'Alex', email: 'alex@example.com', message: 'Hi' });
+  assert.equal(shortMsg.ok, false);
+
+  const spam = validateInquiryFields({
+    name: 'Bot',
+    email: 'bot@example.com',
+    message: 'Spam message content',
+    website: 'https://spam.example',
+  });
+  assert.equal(spam.ok, false);
+  assert.equal(spam.isSpam, true);
+
+  const valid = validateInquiryFields({
+    topic: 'Dec 2026 OJT / Internship',
+    name: '  Alex Reyes  ',
+    email: 'alex@company.com',
+    message: 'Looking to interview you for our Dec 2026 internship cohort.',
+  });
+  assert.equal(valid.ok, true);
+  assert.equal(valid.cleaned.name, 'Alex Reyes');
+});
+
+test('isConfiguredWorkerEndpoint and resolveInquiryFromSearch handle placeholders and query params', () => {
+  assert.equal(isConfiguredWorkerEndpoint('[ADD: Cloudflare Worker Contact Endpoint URL]'), false);
+  assert.equal(isConfiguredWorkerEndpoint(''), false);
+  assert.equal(isConfiguredWorkerEndpoint('https://vlad-contact.workers.dev'), true);
+
+  const opts = ['Dec 2026 OJT / Internship', 'Junior Developer Role', 'Video Editing / Motion'];
+  assert.equal(resolveInquiryFromSearch('?inquiry=Dec%202026%20OJT%20%2F%20Internship', opts), 'Dec 2026 OJT / Internship');
+  assert.equal(resolveInquiryFromSearch('?topic=video', opts), 'Video Editing / Motion');
+  assert.equal(resolveInquiryFromSearch('?inquiry=nonexistent', opts), null);
 });
