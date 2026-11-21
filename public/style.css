@@ -5433,6 +5433,67 @@ body.light-mode .about-r2-chip:hover {
     pointer-events: none;
 }
 
+/* While 2048 modal is open: stay above overlay for milestone bubbles, hide trigger if it would overlap the board */
+.mascot-root.is-game-open {
+    z-index: 2120;
+}
+
+.mascot-root.is-game-board-clear:not(.is-chat-open) .mascot-trigger {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(calc(100% + 28px));
+}
+
+/* Collapsed pill after scroll-triggering actions ("R2-D2 · tap to chat") */
+.mascot-collapsed-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    border: 1px solid rgba(107, 159, 240, 0.52);
+    background: rgba(11, 17, 30, 0.94);
+    color: var(--text-main);
+    font-family: var(--font-sans);
+    font-size: 0.78rem;
+    font-weight: 600;
+    line-height: 1.2;
+    white-space: nowrap;
+    cursor: pointer;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow:
+        0 12px 28px -8px rgba(0, 0, 0, 0.62),
+        0 0 18px -4px rgba(74, 128, 224, 0.34);
+    transition: transform 0.18s var(--ease-smooth), border-color 0.18s ease, background-color 0.18s ease;
+}
+
+.mascot-collapsed-pill[hidden] {
+    display: none;
+}
+
+.mascot-collapsed-pill:hover,
+.mascot-collapsed-pill:focus-visible {
+    transform: translateY(-2px);
+    border-color: var(--accent-navy-light);
+    background: rgba(20, 34, 60, 0.96);
+}
+
+.mascot-collapsed-pill:focus-visible {
+    outline: 2px solid var(--accent-navy-light);
+    outline-offset: 3px;
+}
+
+body.light-mode .mascot-collapsed-pill {
+    background: rgba(248, 250, 255, 0.96);
+    color: var(--text-main);
+}
+
+body.light-mode .mascot-collapsed-pill:hover,
+body.light-mode .mascot-collapsed-pill:focus-visible {
+    background: rgba(235, 242, 255, 0.98);
+}
+
 /* Floating speech bubble */
 .mascot-bubble {
     max-width: min(245px, calc(100vw - 28px));
@@ -5472,6 +5533,21 @@ body.light-mode .mascot-bubble {
     margin: 0;
     border-radius: 14px;
     transition: opacity 0.16s ease;
+}
+
+.mascot-bubble.is-game-bubble {
+    z-index: 2130;
+    border-color: rgba(107, 159, 240, 0.68);
+    pointer-events: none;
+}
+
+.mascot-root.is-game-board-clear .mascot-bubble.is-game-bubble {
+    position: fixed;
+    top: calc(12px + env(safe-area-inset-top, 0px));
+    right: calc(14px + env(safe-area-inset-right, 0px));
+    bottom: auto;
+    max-width: min(260px, calc(100vw - 28px));
+    border-radius: 14px;
 }
 
 .mascot-bubble.is-alarmed-bubble {
@@ -5868,8 +5944,8 @@ body.light-mode .mascot-bubble {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 12px;
-    padding: 12px 14px;
+    gap: 6px;
+    padding: 10px 10px;
     border-bottom: 1px solid var(--border-hairline);
     background: rgba(15, 26, 46, 0.45);
 }
@@ -5877,13 +5953,14 @@ body.light-mode .mascot-bubble {
 .mascot-chat-identity {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 7px;
     min-width: 0;
+    flex: 1 1 auto;
 }
 
 .mascot-chat-avatar {
-    width: 34px;
-    height: 34px;
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
     border: none;
     display: inline-flex;
@@ -5896,24 +5973,25 @@ body.light-mode .mascot-bubble {
 
 .mascot-avatar-svg {
     display: block;
-    width: 34px;
-    height: 34px;
+    width: 30px;
+    height: 30px;
 }
 
 .mascot-chat-titles {
     min-width: 0;
+    flex: 1 1 auto;
 }
 
 .mascot-chat-title-row {
     display: flex;
     align-items: center;
-    gap: 7px;
+    gap: 6px;
 }
 
 .mascot-chat-name {
     margin: 0;
     font-family: var(--font-sans);
-    font-size: 0.92rem;
+    font-size: 0.88rem;
     font-weight: 700;
     color: var(--text-main);
     line-height: 1.2;
@@ -5926,33 +6004,76 @@ body.light-mode .mascot-bubble {
     background: #34d399;
     box-shadow: 0 0 0 2px rgba(52, 211, 153, 0.22), 0 0 8px rgba(52, 211, 153, 0.7);
     flex-shrink: 0;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.mascot-online-dot.is-ai {
+    background: #34d399;
+    box-shadow: 0 0 0 2px rgba(52, 211, 153, 0.22), 0 0 8px rgba(52, 211, 153, 0.7);
+}
+
+.mascot-online-dot.is-offline {
+    background: #f59e0b;
+    box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.24), 0 0 8px rgba(245, 158, 11, 0.7);
 }
 
 .mascot-chat-sub {
     margin: 2px 0 0;
-    font-size: 0.72rem;
+    font-size: 0.66rem;
+    letter-spacing: -0.01em;
     color: var(--text-muted);
     line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .mascot-chat-controls {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 4px;
     flex-shrink: 0;
 }
 
+.mascot-new-chat-btn {
+    height: 28px;
+    padding: 0 8px;
+    border-radius: 999px;
+    border: 1px solid var(--border-hairline);
+    background: transparent;
+    color: var(--text-muted);
+    font-family: var(--font-sans);
+    font-size: 0.66rem;
+    font-weight: 600;
+    line-height: 1;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: color 0.16s ease, border-color 0.16s ease, background-color 0.16s ease;
+}
+
+.mascot-new-chat-btn:hover,
+.mascot-new-chat-btn:focus-visible {
+    color: var(--text-main);
+    border-color: var(--accent-navy-light);
+    background: var(--accent-soft);
+}
+
+.mascot-new-chat-btn:focus-visible {
+    outline: 2px solid var(--accent-navy-light);
+    outline-offset: 2px;
+}
+
 .mascot-icon-btn {
-    width: 32px;
-    height: 32px;
-    border-radius: 10px;
+    width: 28px;
+    height: 28px;
+    border-radius: 9px;
     border: 1px solid var(--border-hairline);
     background: transparent;
     color: var(--text-muted);
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.82rem;
+    font-size: 0.78rem;
     cursor: pointer;
     transition: color 0.16s ease, border-color 0.16s ease, background-color 0.16s ease;
 }
@@ -6118,23 +6239,25 @@ body.light-mode .mascot-bubble {
     line-height: 1;
 }
 
-/* Typing indicator: 3 pulsing dots inside a droid bubble */
+/* Typing indicator: 3 pulsing dots + "R2-D2 is beeping..." inside a droid bubble */
 .mascot-msg-typing .mascot-msg-bubble {
-    padding: 11px 14px;
+    padding: 9px 13px;
     display: inline-flex;
     align-items: center;
+    gap: 9px;
 }
 
 .mascot-typing-dots {
     display: inline-flex;
     align-items: center;
-    gap: 5px;
+    gap: 4px;
     height: 10px;
+    flex-shrink: 0;
 }
 
 .mascot-typing-dot {
-    width: 6px;
-    height: 6px;
+    width: 5px;
+    height: 5px;
     border-radius: 50%;
     background: var(--accent-navy-light);
     opacity: 0.35;
@@ -6149,6 +6272,14 @@ body.light-mode .mascot-bubble {
     animation-delay: 0.36s;
 }
 
+.mascot-typing-label {
+    font-family: var(--font-mono);
+    font-style: italic;
+    font-size: 0.74rem;
+    color: var(--text-muted);
+    line-height: 1.25;
+}
+
 @keyframes mascot-dot-pulse {
     0%, 80%, 100% {
         opacity: 0.3;
@@ -6160,7 +6291,18 @@ body.light-mode .mascot-bubble {
     }
 }
 
-/* Fixed bottom zone: non-scrolling chips + input bar */
+/* Inline contextual suggestion chips rendered under the latest droid message only */
+.mascot-inline-chips {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    max-width: 96%;
+    padding: 0 2px 2px;
+    overflow: hidden;
+}
+
+/* Fixed bottom zone: input bar */
 .mascot-chat-footer {
     flex: 0 0 auto;
     border-top: 1px solid var(--border-hairline);
@@ -6213,7 +6355,7 @@ body.light-mode .mascot-bubble {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 6px 12px 12px;
+    padding: 10px 12px;
 }
 
 .mascot-input {

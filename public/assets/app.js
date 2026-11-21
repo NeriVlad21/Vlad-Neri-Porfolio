@@ -1726,6 +1726,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let board = [];
   let score = 0;
+  const reachedMilestones = new Set();
+  let winEventDispatched = false;
+  let gameOverDispatched = false;
+
+  const emitGame2048Event = (type, value) => {
+    window.dispatchEvent(new CustomEvent('game2048', { detail: { type, value } }));
+  };
+
+  const emitGame2048Visibility = (open) => {
+    window.dispatchEvent(new CustomEvent('game2048:visibility', { detail: { open: Boolean(open) } }));
+  };
 
   const spawnTile = () => {
     const empty = [];
@@ -1758,10 +1769,16 @@ document.addEventListener('DOMContentLoaded', () => {
   const initGame = () => {
     board = Array.from({ length: 4 }, () => Array(4).fill(0));
     score = 0;
+    reachedMilestones.clear();
+    winEventDispatched = false;
+    gameOverDispatched = false;
     if (gameOverBanner) gameOverBanner.hidden = true;
     spawnTile();
     spawnTile();
     renderBoard();
+    if (gameModal && !gameModal.hidden) {
+      emitGame2048Event('start', 0);
+    }
   };
 
   const handleMove = (dir) => {
@@ -1771,30 +1788,93 @@ document.addEventListener('DOMContentLoaded', () => {
     score += res.gained;
     spawnTile();
     renderBoard();
+
+    let maxTile = 0;
+    for (let r = 0; r < 4; r++) {
+      for (let c = 0; c < 4; c++) {
+        if (board[r][c] > maxTile) maxTile = board[r][c];
+      }
+    }
+    if (maxTile >= 2048 && !winEventDispatched) {
+      winEventDispatched = true;
+      emitGame2048Event('win', 2048);
+    } else {
+      for (const milestone of [1024, 512, 256, 128]) {
+        if (maxTile >= milestone && !reachedMilestones.has(milestone)) {
+          reachedMilestones.add(milestone);
+          emitGame2048Event('milestone', milestone);
+          break;
+        }
+      }
+    }
+
     if (isBoardGameOver(board) && gameOverBanner && finalScoreEl) {
       finalScoreEl.textContent = `Final Score: ${score}`;
       gameOverBanner.hidden = false;
+      if (!gameOverDispatched) {
+        gameOverDispatched = true;
+        emitGame2048Event('gameover', score);
+      }
     }
+  };
+
+  const openGame2048 = () => {
+    if (!gameModal) return false;
+    gameModal.hidden = false;
+    initGame();
+    setSidebarOpen(false);
+    emitGame2048Visibility(true);
+    closeGameBtn?.focus();
+    return true;
+  };
+
+  const closeGame2048 = () => {
+    if (!gameModal || gameModal.hidden) return;
+    gameModal.hidden = true;
+    emitGame2048Visibility(false);
+  };
+
+  window.openGame2048 = openGame2048;
+  window.__vladMascotBridge = {
+    openGame2048,
+    openProject: (projectId) => {
+      if (!projectModal) return false;
+      openProjectModal(projectId);
+      return true;
+    },
+    openTech: (techId) => {
+      if (!Array.isArray(TECH_STACK_NODES)) return false;
+      const node = TECH_STACK_NODES.find(
+        (n) => n.id.toLowerCase() === String(techId || '').toLowerCase() ||
+               n.name.toLowerCase() === String(techId || '').toLowerCase()
+      );
+      if (!node) return false;
+      const triggerBtn = document.querySelector(`.stack-logo-btn[data-tech-id="${node.id}"]`);
+      openStackPanel(node, triggerBtn || null);
+      return true;
+    },
+    preselectInquiry: (inquiryValue) => {
+      if (typeof preselectInquiry !== 'function') return false;
+      preselectInquiry(inquiryValue);
+      return true;
+    },
   };
 
   if (gameModal) {
     for (const triggerBtn of openGameBtns) {
       triggerBtn.addEventListener('click', () => {
-        gameModal.hidden = false;
-        initGame();
-        setSidebarOpen(false);
-        closeGameBtn?.focus();
+        openGame2048();
       });
     }
   }
   if (closeGameBtn && gameModal) {
     closeGameBtn.addEventListener('click', () => {
-      gameModal.hidden = true;
+      closeGame2048();
     });
   }
   if (gameModal) {
     gameModal.addEventListener('click', (e) => {
-      if (e.target === gameModal) gameModal.hidden = true;
+      if (e.target === gameModal) closeGame2048();
     });
   }
   if (resetGameBtn) resetGameBtn.addEventListener('click', initGame);
@@ -1836,7 +1916,7 @@ document.addEventListener('DOMContentLoaded', () => {
       closeProjectModal();
       closeVideoModal();
       closeCertModal();
-      if (gameModal && !gameModal.hidden) gameModal.hidden = true;
+      closeGame2048();
       return;
     }
 
@@ -1855,6 +1935,10 @@ document.addEventListener('DOMContentLoaded', () => {
       handleMove('right');
     }
   });
+
+  if (gameModal && new URLSearchParams(window.location.search).get('play2048') === '1') {
+    openGame2048();
+  }
 
   initMascot();
 });
